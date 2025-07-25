@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="VisaApplet" default="build" basedir=".">
+    <description>Build file for Visa JavaCard Applet</description>
+    
+    <!-- Properties -->
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="cap.dir" value="cap"/>
+    
+    <!-- JavaCard SDK path - adjust this to your installation -->
+    <property name="jc.home" value="${lib.dir}/jc305u4_kit" />
+    
+    <!-- Import ant-javacard -->
+    <taskdef name="javacard" classname="pro.javacard.ant.JavaCard" classpath="${lib.dir}/ant-javacard.jar"/>
+
+    <!-- Clean target -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${cap.dir}"/>
+    </target>
+    
+    <!-- Prepare target -->
+    <target name="prepare">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${cap.dir}"/>
+    </target>
+    
+    <!-- Build target -->
+    <target name="build" depends="clean, prepare">
+        <javacard jckit="${jc.home}">
+            <cap output="${cap.dir}/OpenEMV.cap" 
+                 sources="${src.dir}"
+                 package="openemv"
+                 aid="A0000000020304"
+                 version="1.0">
+                <applet class="openemv.SimpleEMVApplet" aid="A000000002030405"/>
+            </cap>
+        </javacard>
+    </target>
+    
+    <target name="install" depends="build">
+        <echo message="Installing applet with custom keys..."/>
+        <exec executable="java" failonerror="true">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--install ${cap.dir}/OpenEMV.cap"/>
+        </exec>
+    </target>
+
+    <target name="list-applets">
+        <echo message="Listing installed applets..."/>
+        <exec executable="java" failonerror="true">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--list"/>
+            <arg line="--verbose"/>
+        </exec>
+    </target>
+
+    <target name="delete-applet">
+        <echo message="Deleting existing applet..."/>
+        <exec executable="java" failonerror="false">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--delete A000000002030405"/>
+        </exec>
+        <exec executable="java" failonerror="false">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--delete A0000000020304"/>
+        </exec>
+    </target>
+
+    <target name="reinstall" depends="delete-applet, install">
+        <echo message="Reinstallation complete"/>
+    </target>
+
+    <target name="select-applet">
+        <echo message="Selecting applet..."/>
+        <exec executable="java" failonerror="true">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--apdu 00A4040007A000000002030405"/>
+        </exec>
+    </target>
+
+    <target name="test-gpo" depends="select-applet">
+        <echo message="Testing GPO..."/>
+        <exec executable="java" failonerror="true">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--apdu 00:A8:00:00:02:83:00"/>
+        </exec>
+    </target>
+
+    <target name="read-record" depends="select-applet">
+        <echo message="Reading record..."/>
+        <exec executable="java" failonerror="true">
+            <arg line="-jar lib/gp.jar"/>
+            <arg line="--reader 'ACS ACR1252 Dual Reader PICC'"/>
+            <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
+            <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
+            <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--apdu 00:B2:01:0C:00"/>
+        </exec>
+    </target>
+
+</project>
