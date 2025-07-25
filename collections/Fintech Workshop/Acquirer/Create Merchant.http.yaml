@@ -1,0 +1,11 @@
+method: post
+url: 127.0.0.1:8080/merchants
+requestBody:
+  type: application/json
+  data: |-
+    {
+        "Name": "Adam's Bread",
+        "MCC": "1234",
+        "PostalCode": "02129",
+        "WebSite": "https://bostonbreadbakery.com"
+    }

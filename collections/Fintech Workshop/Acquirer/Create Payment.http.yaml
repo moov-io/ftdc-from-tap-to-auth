@@ -1,0 +1,14 @@
+method: post
+url: 127.0.0.1:8080/merchants/b150346d-f4d3-4958-8bed-1bb5d269bdf1/payments
+requestBody:
+  type: application/json
+  data: |-
+    {
+        "Amount": 100,
+        "Currency": "USD",
+        "Card": {
+            "Number": "9368452618578000",
+            "ExpirationDate": "0828",
+            "CardVerificationValue": "1234"
+        }
+    }

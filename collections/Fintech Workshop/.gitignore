@@ -1,0 +1,4 @@
+node_modules
+.git
+apidog.private.*
+.apidog

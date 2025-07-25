@@ -1,0 +1,11 @@
+method: post
+url: 127.0.0.1:9090/accounts/44ce5007-9333-4767-8362-3ec80c769586/cards
+requestBody:
+  type: application/json
+  data: |-
+    {
+        "expiry": "0926",
+        "brand": "Mastercard",
+        "pin": "2233",
+        "cvv": "1234"
+    }

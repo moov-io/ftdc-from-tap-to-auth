@@ -1,0 +1,10 @@
+method: post
+url: 127.0.0.1:9090/accounts
+requestBody:
+  type: application/json
+  data: |-
+    {
+        "owner": "Adam Kornafeld",
+        "balance": 100,
+        "currency": "USD"
+    }
