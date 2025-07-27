@@ -3,7 +3,7 @@ package models
 import (
 	"regexp"
 
-	"github.com/alovak/cardflow-playground/cardpersonalizer/card"
+	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/card"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 

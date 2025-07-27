@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/alovak/cardflow-playground/issuer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 )
 
 type client struct {

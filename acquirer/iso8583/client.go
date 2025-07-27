@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alovak/cardflow-playground/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/moov-io/iso8583"
 	iso8583Connection "github.com/moov-io/iso8583-connection"
 	"golang.org/x/exp/slog"

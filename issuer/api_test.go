@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/alovak/cardflow-playground/issuer"
-	"github.com/alovak/cardflow-playground/issuer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 )

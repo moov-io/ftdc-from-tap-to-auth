@@ -6,13 +6,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/alovak/cardflow-playground/acquirer/client"
-	"github.com/alovak/cardflow-playground/acquirer/models"
-	"github.com/alovak/cardflow-playground/emv"
-	"github.com/alovak/cardflow-playground/emv/paycard"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/client"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
+	tm "github.com/moov-io/ftdc-from-tap-to-auth/terminal"
+	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/paycard"
 )
 
 func main() {
+
 	readerIndex := flag.Int("reader", -1, "Index of reader to use (default: interactive selection)")
 	cvv := flag.String("cvv", "123", "CVV code of the card (default: 123)")
 	amount := flag.Int64("amount", 0, "Amount to authorize (default: 10)")
@@ -50,7 +51,7 @@ func main() {
 	// TODO: This Main should all be inside of a NewTerminal() function that returns a terminal struct
 
 	// Establish context with PC/SC reader
-	cardReader, err := emv.NewCardReader()
+	cardReader, err := tm.NewCardReader()
 	if err != nil {
 		fmt.Println("Failed to create card reader:", err)
 		os.Exit(1)

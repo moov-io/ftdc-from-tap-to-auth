@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"sync"
 
-	cardpersonalizer "github.com/alovak/cardflow-playground/cardpersonalizer/client"
-	"github.com/alovak/cardflow-playground/internal/middleware"
-	// "github.com/alovak/cardflow-playground/issuer"
-	issuer8583 "github.com/alovak/cardflow-playground/issuer/iso8583"
+	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
+	// "github.com/moov-io/ftdc-from-tap-to-auth/issuer"
+	issuer8583 "github.com/moov-io/ftdc-from-tap-to-auth/issuer/iso8583"
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )

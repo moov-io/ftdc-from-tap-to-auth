@@ -1,4 +1,4 @@
-module github.com/alovak/cardflow-playground
+module github.com/moov-io/ftdc-from-tap-to-auth
 
 go 1.23.1
 

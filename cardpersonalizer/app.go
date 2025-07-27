@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/alovak/cardflow-playground/internal/middleware"
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )

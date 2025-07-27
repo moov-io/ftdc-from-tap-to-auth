@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alovak/cardflow-playground/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/google/uuid"
 )
 

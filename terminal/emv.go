@@ -1,4 +1,4 @@
-package emv
+package terminal
 
 import (
 	"bufio"
@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alovak/cardflow-playground/acquirer/models"
-	"github.com/alovak/cardflow-playground/emv/paycard"
 	"github.com/ebfe/scard"
 	"github.com/kr/pretty"
 	"github.com/moov-io/bertlv"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/paycard"
 	"github.com/moov-io/iso8583/encoding"
 )
 

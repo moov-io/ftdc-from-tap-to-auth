@@ -5,8 +5,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/alovak/cardflow-playground/issuer"
-	"github.com/alovak/cardflow-playground/log"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer"
+	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 )
 
 func main() {

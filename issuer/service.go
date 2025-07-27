@@ -6,9 +6,9 @@ import (
 	"math/rand"
 	"time"
 
-	cardpersonalizer "github.com/alovak/cardflow-playground/cardpersonalizer/client"
-	cpm "github.com/alovak/cardflow-playground/cardpersonalizer/models"
-	"github.com/alovak/cardflow-playground/issuer/models"
+	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
+	cpm "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/google/uuid"
 )
 

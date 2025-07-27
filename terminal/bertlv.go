@@ -1,4 +1,4 @@
-package emv
+package terminal
 
 import (
 	"fmt"

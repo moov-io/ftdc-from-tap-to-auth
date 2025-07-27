@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alovak/cardflow-playground/cardpersonalizer/card"
-	"github.com/alovak/cardflow-playground/cardpersonalizer/models"
-	"github.com/alovak/cardflow-playground/emv"
 	"github.com/google/uuid"
+	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/card"
+	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/terminal"
 	"github.com/moov-io/iso8583/encoding"
 	"golang.org/x/exp/slog"
 )
@@ -25,7 +25,7 @@ type CardResult struct {
 }
 
 type Service struct {
-	cardReader *emv.CardReader
+	cardReader *terminal.CardReader
 	jobQueue   chan CardJob
 	state      *JobState
 	logger     *slog.Logger
@@ -41,7 +41,7 @@ type JobState struct {
 }
 
 func NewService(logger *slog.Logger, readerName string) (*Service, error) {
-	cardReader, err := emv.NewCardReader()
+	cardReader, err := terminal.NewCardReader()
 	if err != nil {
 		return nil, fmt.Errorf("creating card reader: %w", err)
 	}

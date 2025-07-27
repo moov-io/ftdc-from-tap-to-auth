@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/alovak/cardflow-playground/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )

@@ -3,7 +3,7 @@ package iso8583
 import (
 	"fmt"
 
-	"github.com/alovak/cardflow-playground/issuer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/moov-io/iso8583"
 	iso8583Connection "github.com/moov-io/iso8583-connection"
 	iso8583Server "github.com/moov-io/iso8583-connection/server"

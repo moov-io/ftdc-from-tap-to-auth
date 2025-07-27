@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/alovak/cardflow-playground/acquirer"
-	acquirerClient "github.com/alovak/cardflow-playground/acquirer/client"
-	"github.com/alovak/cardflow-playground/acquirer/models"
-	"github.com/alovak/cardflow-playground/issuer"
-	issuerClient "github.com/alovak/cardflow-playground/issuer/client"
-	issuerModels "github.com/alovak/cardflow-playground/issuer/models"
-	"github.com/alovak/cardflow-playground/log"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer"
+	acquirerClient "github.com/moov-io/ftdc-from-tap-to-auth/acquirer/client"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer"
+	issuerClient "github.com/moov-io/ftdc-from-tap-to-auth/issuer/client"
+	issuerModels "github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 	"github.com/stretchr/testify/require"
 )
 

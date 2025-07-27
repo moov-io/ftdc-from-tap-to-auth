@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/alovak/cardflow-playground/cardpersonalizer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
 	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )
