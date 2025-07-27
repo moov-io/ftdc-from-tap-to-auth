@@ -67,6 +67,9 @@ func (c *CardReader) DisplayReaders() {
 func (c *CardReader) SelectReader() (string, error) {
 	if len(c.Readers) < 1 {
 		return "", fmt.Errorf("no readers found")
+	} else if len(c.Readers) == 1 {
+		c.SelectedReader = c.Readers[0]
+		return c.SelectedReader, nil
 	}
 
 	for {
@@ -107,27 +110,78 @@ func (c *CardReader) ConnectToCard() error {
 	return nil
 }
 
+func (c *CardReader) WaitForCardAsync(timeout time.Duration) <-chan error {
+	resultChan := make(chan error, 1)
+
+	go func() {
+		defer close(resultChan)
+
+		readerStates := []scard.ReaderState{
+			{
+				Reader:       c.SelectedReader,
+				CurrentState: scard.StateEmpty,
+			},
+		}
+
+		fmt.Println("Waiting for card...")
+		err := c.ctx.GetStatusChange(readerStates, timeout)
+		if err != nil {
+			resultChan <- fmt.Errorf("failed to wait for card: %v", err)
+			return
+		}
+
+		// Check if the card is present
+		if readerStates[0].EventState&scard.StatePresent != 0 {
+			fmt.Println("Card presented.")
+			resultChan <- nil
+			return
+		}
+
+		resultChan <- fmt.Errorf("timeout waiting for card")
+	}()
+
+	return resultChan
+}
+
+func (c *CardReader) WaitForCardRemoveAsync(timeout time.Duration) <-chan error {
+	resultChan := make(chan error, 1)
+
+	go func() {
+		defer close(resultChan)
+
+		readerStates := []scard.ReaderState{
+			{
+				Reader:       c.SelectedReader,
+				CurrentState: scard.StatePresent,
+			},
+		}
+
+		fmt.Println("Waiting for card remove...")
+		err := c.ctx.GetStatusChange(readerStates, timeout)
+		if err != nil {
+			resultChan <- fmt.Errorf("failed waiting for card remove: %v", err)
+			return
+		}
+
+		// Check if the card is removed
+		if readerStates[0].EventState&scard.StateEmpty != 0 {
+			fmt.Println("Card removed.")
+			resultChan <- nil
+			return
+		}
+
+		resultChan <- fmt.Errorf("timeout waiting for card remove")
+	}()
+
+	return resultChan
+}
+
 func (c *CardReader) WaitForCard(timeout time.Duration) error {
-	readerStates := []scard.ReaderState{
-		{
-			Reader:       c.SelectedReader,
-			CurrentState: scard.StateEmpty,
-		},
-	}
+	return <-c.WaitForCardAsync(timeout)
+}
 
-	fmt.Println("Waiting for card...")
-	err := c.ctx.GetStatusChange(readerStates, timeout)
-	if err != nil {
-		return fmt.Errorf("failed to wait for card: %v", err)
-	}
-
-	// Check if the card is present
-	if readerStates[0].EventState&scard.StatePresent != 0 {
-		fmt.Println("Card presented.")
-		return nil
-	}
-
-	return fmt.Errorf("timeout waiting for card")
+func (c *CardReader) WaitForCardRemove(timeout time.Duration) error {
+	return <-c.WaitForCardRemoveAsync(timeout)
 }
 
 func (c *CardReader) DirectApplicationSelection(emvCard *paycard.EmvCard) error {

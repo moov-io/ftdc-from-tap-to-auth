@@ -13,15 +13,18 @@ import (
 )
 
 type App struct {
-	srv    *http.Server
-	wg     *sync.WaitGroup
-	Addr   string
-	logger *slog.Logger
-	config *Config
+	srv     *http.Server
+	wg      *sync.WaitGroup
+	Addr    string
+	logger  *slog.Logger
+	config  *Config
+	service *Service
+	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
 func NewApp(logger *slog.Logger, config *Config) *App {
-	logger = logger.With(slog.String("app", "acquirer"))
+	logger = logger.With(slog.String("app", "card-personalizer"))
 
 	if config == nil {
 		config = DefaultConfig()
@@ -41,8 +44,16 @@ func (a *App) Start() error {
 	router := chi.NewRouter()
 	router.Use(middleware.NewStructuredLogger(a.logger))
 
-	acq := NewService()
-	api := NewAPI(a.logger, acq)
+	cp, err := NewService(a.logger, a.config.CardReader)
+	if err != nil {
+		return fmt.Errorf("creating card personalizer service: %w", err)
+	}
+
+	a.service = cp
+	a.ctx, a.cancel = context.WithCancel(context.Background())
+
+	go cp.Run(a.ctx)
+	api := NewAPI(a.logger, cp)
 	api.AppendRoutes(router)
 
 	l, err := net.Listen("tcp", a.config.HTTPAddr)
@@ -76,6 +87,9 @@ func (a *App) Start() error {
 
 func (a *App) Shutdown() {
 	a.logger.Info("shutting down app...")
+
+	// Stop the service
+	a.cancel()
 
 	a.srv.Shutdown(context.Background())
 
