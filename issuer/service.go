@@ -40,6 +40,15 @@ func (i *Service) CreateAccount(req models.CreateAccount) (*models.Account, erro
 	return account, nil
 }
 
+func (i *Service) GetAccounts() ([]models.Account, error) {
+	accounts, err := i.repo.GetAccounts()
+	if err != nil {
+		return nil, fmt.Errorf("getting accounts: %w", err)
+	}
+
+	return accounts, nil
+}
+
 func (i *Service) GetAccount(accountID string) (*models.Account, error) {
 	account, err := i.repo.GetAccount(accountID)
 	if err != nil {

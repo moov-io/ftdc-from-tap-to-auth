@@ -34,6 +34,23 @@ func (r *Repository) CreateAccount(account *models.Account) error {
 	return nil
 }
 
+func (r *Repository) GetAccounts() ([]models.Account, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	accounts := make([]models.Account, 0)
+	for _, account := range r.Accounts {
+		accounts = append(accounts, models.Account{
+			ID:               account.ID,
+			OwnerName:        account.OwnerName,
+			AvailableBalance: account.AvailableBalance,
+			HoldBalance:      account.HoldBalance,
+			Currency:         account.Currency,
+		})
+	}
+	return accounts, nil
+}
+
 func (r *Repository) GetAccount(accountID string) (*models.Account, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -87,7 +104,7 @@ func (r *Repository) ListTransactions(accountID string) ([]*models.Transaction, 
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	var transactions []*models.Transaction
+	transactions := make([]*models.Transaction, 0)
 
 	for _, transaction := range r.Transactions {
 		if transaction.AccountID == accountID {

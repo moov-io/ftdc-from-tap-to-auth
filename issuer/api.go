@@ -23,6 +23,7 @@ func NewAPI(issuer *Service) *API {
 
 func (a *API) AppendRoutes(r chi.Router) {
 	r.Route("/accounts", func(r chi.Router) {
+		r.Get("/", a.getAccounts)
 		r.Post("/", a.createAccount)
 		r.Route("/{accountID}", func(r chi.Router) {
 			r.Get("/", a.getAccount)
@@ -115,4 +116,20 @@ func (a *API) getTransactions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(transactions)
+}
+
+func (a *API) getAccounts(w http.ResponseWriter, _ *http.Request) {
+	account, err := a.issuer.GetAccounts()
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(account)
 }
