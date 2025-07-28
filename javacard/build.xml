@@ -47,6 +47,7 @@
             <arg line="--key-enc 90379A3E7116D455E55F9398736A01CA"/>
             <arg line="--key-mac 473F36161A7F7F60CC3A766EA4BE5247"/>
             <arg line="--key-dek D3749ED4FF42FD58B39EEB562B017CD9"/>
+            <arg line="--debug"/>
             <arg line="--install ${cap.dir}/OpenEMV.cap"/>
         </exec>
     </target>

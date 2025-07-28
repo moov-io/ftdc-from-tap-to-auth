@@ -15,7 +15,7 @@ import (
 func main() {
 
 	readerIndex := flag.Int("reader", -1, "Index of reader to use (default: interactive selection)")
-	cvv := flag.String("cvv", "123", "CVV code of the card (default: 123)")
+	cvv := flag.String("cvv", "1234", "CVV code of the card (default: 1234)")
 	amount := flag.Int64("amount", 0, "Amount to authorize (default: 10)")
 	merchantID := flag.String("merchant", "", "ID of merchant to create payment for")
 

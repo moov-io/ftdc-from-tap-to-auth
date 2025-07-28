@@ -96,6 +96,7 @@ func (s *Service) Run(ctx context.Context) {
 			s.handleCardRemoved(err, s.state)
 
 		case <-ctx.Done():
+			s.cardReader.Close()
 			s.logger.Info("context cancelled, stopping service")
 			return
 		}
@@ -199,6 +200,12 @@ func (s *Service) PersonalizeCard(cardReq models.CardRequest) (models.CardRespon
 		return models.CardResponse{}, fmt.Errorf("validation failed: %w", err)
 	}
 
+	selectedReader := s.cardReader.SelectedReader
+	err := s.cardReader.Close()
+	if err != nil {
+		return models.CardResponse{}, fmt.Errorf("closing card reader: %w", err)
+	}
+
 	// Generate unique request ID for workspace isolation
 	requestID := uuid.NewString()
 
@@ -248,6 +255,12 @@ func (s *Service) PersonalizeCard(cardReq models.CardRequest) (models.CardRespon
 	if err := card.FlashCardWithBinary(requestID); err != nil {
 		return models.CardResponse{}, fmt.Errorf("flashing card: %w", err)
 	}
+
+	s.cardReader, err = emv.NewCardReader()
+	if err != nil {
+		return models.CardResponse{}, fmt.Errorf("recreating card reader: %w", err)
+	}
+	s.cardReader.SelectedReader = selectedReader
 
 	return models.CardResponse{
 		CardHolder: cardReq.Name,
