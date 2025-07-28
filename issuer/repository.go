@@ -79,8 +79,7 @@ func (r *Repository) FindCardForAuthorization(card models.Card) (*models.Card, e
 
 	for _, c := range r.Cards {
 		match := c.Number == card.Number &&
-			c.ExpirationDate == card.ExpirationDate &&
-			c.CardVerificationValue == card.CardVerificationValue
+			c.ExpirationDate == card.ExpirationDate
 
 		if match {
 			return c, nil
