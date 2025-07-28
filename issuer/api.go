@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/go-chi/chi/v5"
+	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 )
 
 // API is a HTTP API for the issuer service
@@ -73,11 +73,16 @@ func (a *API) getAccount(w http.ResponseWriter, r *http.Request) {
 func (a *API) issueCard(w http.ResponseWriter, r *http.Request) {
 	accountID := chi.URLParam(r, "accountID")
 
+	var shouldFlash bool
+	var err error
+
 	flashCard := r.URL.Query().Get("flashCard")
-	shouldFlash, err := strconv.ParseBool(flashCard)
-	if err != nil {
-		http.Error(w, "Invalid flashCard parameter", http.StatusBadRequest)
-		return
+	if flashCard != "" {
+		shouldFlash, err = strconv.ParseBool(flashCard)
+		if err != nil {
+			http.Error(w, "Invalid flashCard parameter", http.StatusBadRequest)
+			return
+		}
 	}
 
 	cardRequest := models.CardRequest{}

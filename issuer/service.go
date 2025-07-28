@@ -6,10 +6,10 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/google/uuid"
 	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
 	cpm "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
-	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -72,6 +72,7 @@ func (i *Service) IssueCard(accountID string, cardRequest models.CardRequest, sh
 		ExpirationDate:        cardRequest.ExpiryDate,
 	}
 
+	// TODO: hardcode number so in emulator mode, we can test without cardpersonalizer
 	card.Number = models.GenerateCardNumber("7")
 
 	if shouldPersonalize {
