@@ -152,6 +152,17 @@ The directory structure for issuer and acquirer is outlined below:
 ### Prerequisites
 
 - Install Go version 1.20 or later
+  - Debian/Ubuntu: `sudo apt install golang`
+  - MacOS: `brew install go`
+- Install PC/SC lite package
+  - Debian/Ubuntu: `sudo apt-get install pcscd libpcsclite-dev`
+  - MacOS: `brew install pcsc-lite`
+- Install Java Development Kit (JDK) 11
+  - Debian/Ubuntu: `sudo apt install openjdk-11-jdk`
+  - MacOS: `brew install openjdk@11`
+- Install Ant
+  - Debian/Ubuntu: `sudo apt install ant`
+  - MacOS: `brew install ant`
 
 ### Running the applications
 
