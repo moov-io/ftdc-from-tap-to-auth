@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/iso8583"
 	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
-	"github.com/go-chi/chi/v5"
 	"golang.org/x/exp/slog"
 )
 
@@ -59,7 +59,7 @@ func (a *App) Start() error {
 		return fmt.Errorf("connecting to iso8583 server: %w", err)
 	}
 
-	acq := NewService(repository, iso8583Client)
+	acq := NewService(a.logger, repository, iso8583Client)
 	api := NewAPI(a.logger, acq)
 	api.AppendRoutes(router)
 

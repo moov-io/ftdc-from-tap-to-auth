@@ -7,9 +7,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
+	"golang.org/x/exp/slog"
 )
 
 type Service struct {
+	logger        *slog.Logger
 	repo          *Repository
 	iso8583Client ISO8583Client
 }
@@ -18,8 +20,9 @@ type ISO8583Client interface {
 	AuthorizePayment(payment *models.Payment, card models.CreatePayment, merchant models.Merchant) (models.AuthorizationResponse, error)
 }
 
-func NewService(repo *Repository, iso8583Client ISO8583Client) *Service {
+func NewService(logger *slog.Logger, repo *Repository, iso8583Client ISO8583Client) *Service {
 	return &Service{
+		logger:        logger,
 		repo:          repo,
 		iso8583Client: iso8583Client,
 	}
@@ -45,7 +48,7 @@ func (a *Service) CreateMerchant(create models.CreateMerchant) (*models.Merchant
 type card struct {
 	PAN            string `bertlv:"5A"`
 	ExpirationDate string `bertlv:"5F24"` // YYMMDD format
-	CardholderName string `bertlv:"5F20"`
+	CardholderName string `bertlv:"5F20,ascii"`
 }
 
 func (a *Service) CreatePayment(merchantID string, create models.CreatePayment) (*models.Payment, error) {
@@ -71,6 +74,12 @@ func (a *Service) CreatePayment(merchantID string, create models.CreatePayment) 
 		if err != nil {
 			return nil, fmt.Errorf("unmarshalling EMV tags: %w", err)
 		}
+
+		a.logger.Info("creating payment with emd payload",
+			slog.String("card holder", c.CardholderName),
+			slog.String("pan", c.PAN),
+			slog.String("expiration date", c.ExpirationDate),
+		)
 
 		payment.Card = models.SafeCard{
 			First6:         c.PAN[:6],

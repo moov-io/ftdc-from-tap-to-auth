@@ -122,6 +122,7 @@ func (t *Terminal) processTransaction(amount int64) ([]bertlv.TLV, error) {
 			return nil, fmt.Errorf("processing PDOL: %w", err)
 		}
 	} else {
+		fmt.Println("PPSE not selected, trying direct application selection...")
 		err = cardReader.DirectApplicationSelection(emvCard)
 		if err != nil {
 			return nil, fmt.Errorf("direct application selection: %w", err)
@@ -132,6 +133,11 @@ func (t *Terminal) processTransaction(amount int64) ([]bertlv.TLV, error) {
 		err = cardReader.ProcessAFL(emvCard)
 		if err != nil {
 			return nil, fmt.Errorf("processing AFL: %w", err)
+		}
+	} else {
+		err := cardReader.ReadRecord(emvCard)
+		if err != nil {
+			return nil, fmt.Errorf("reading record: %w", err)
 		}
 	}
 

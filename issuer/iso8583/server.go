@@ -3,6 +3,7 @@ package iso8583
 import (
 	"fmt"
 
+	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/moov-io/iso8583"
 	iso8583Connection "github.com/moov-io/iso8583-connection"
@@ -126,10 +127,6 @@ func (s *Server) handleAuthorizationRequest(c *iso8583Connection.Connection, mes
 	authRequest := models.AuthorizationRequest{
 		Amount:   requestData.Amount,
 		Currency: requestData.Currency,
-		Card: models.Card{
-			Number:         requestData.PrimaryAccountNumber,
-			ExpirationDate: requestData.ExpirationDate,
-		},
 		Merchant: models.Merchant{
 			Name:       requestData.AcceptorInformation.Name,
 			MCC:        requestData.AcceptorInformation.MCC,
@@ -140,6 +137,35 @@ func (s *Server) handleAuthorizationRequest(c *iso8583Connection.Connection, mes
 
 	if requestData.ChipData != nil {
 		authRequest.EMVPayload = requestData.ChipData
+
+		// extract card details from EMV payload
+		type card struct {
+			PAN            string `bertlv:"5A"`
+			ExpirationDate string `bertlv:"5F24"` // YYMMDD format
+			CardholderName string `bertlv:"5F20,ascii"`
+		}
+
+		emvTags, err := bertlv.Decode(requestData.ChipData)
+		if err != nil {
+			return fmt.Errorf("decoding EMV payload: %w", err)
+		}
+
+		c := &card{}
+		err = bertlv.Unmarshal(emvTags, c)
+		if err != nil {
+			return fmt.Errorf("unmarshalling EMV tags: %w", err)
+		}
+
+		authRequest.Card = models.Card{
+			Number:         c.PAN,
+			ExpirationDate: c.ExpirationDate,
+			CardHolderName: c.CardholderName,
+		}
+	} else {
+		authRequest.Card = models.Card{
+			Number:         requestData.PrimaryAccountNumber,
+			ExpirationDate: requestData.ExpirationDate,
+		}
 	}
 
 	// we define a variable that will hold the response data

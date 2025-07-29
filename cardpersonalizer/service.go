@@ -245,6 +245,7 @@ func (s *Service) PersonalizeCard(cardReq models.CardRequest) (models.CardRespon
 
 	var expiry string
 	if strings.Contains(cardReq.ExpiryDate, "/") {
+		// TODO: update to YYMMDD , day is 31, even for Feb
 		expiry = fmt.Sprintf("%s%s", cardReq.ExpiryDate[3:], cardReq.ExpiryDate[:2])
 	} else {
 		expiry = fmt.Sprintf("%s%s", cardReq.ExpiryDate[2:], cardReq.ExpiryDate[:2])

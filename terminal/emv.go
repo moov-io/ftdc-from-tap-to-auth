@@ -11,9 +11,7 @@ import (
 	"github.com/ebfe/scard"
 	"github.com/kr/pretty"
 	"github.com/moov-io/bertlv"
-	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/paycard"
-	"github.com/moov-io/iso8583/encoding"
 )
 
 type CardReader struct {
@@ -389,7 +387,7 @@ func (c *CardReader) ProcessAFL(emvCard *paycard.EmvCard) error {
 	return nil
 }
 
-func (c *CardReader) ReadRecord(card *paycard.EmvCard) (models.Card, error) {
+func (c *CardReader) ReadRecord(card *paycard.EmvCard) error {
 	// Send READ RECORD command: 00 B2 01 0C
 	// B2 = READ RECORD instruction
 	// 01 = Record number
@@ -398,7 +396,7 @@ func (c *CardReader) ReadRecord(card *paycard.EmvCard) (models.Card, error) {
 
 	response, err := c.Card.Transmit(readCommand)
 	if err != nil {
-		return models.Card{}, fmt.Errorf("sending READ RECORD command: %X, error: %w", readCommand, err)
+		return fmt.Errorf("sending READ RECORD command: %X, error: %w", readCommand, err)
 	}
 
 	fmt.Printf("READ RECORD Response: %X\n", response)
@@ -410,44 +408,29 @@ func (c *CardReader) ReadRecord(card *paycard.EmvCard) (models.Card, error) {
 
 		if sw1 == 0x90 && sw2 == 0x00 {
 			fmt.Println("✅ READ RECORD command successful")
-			ShowBerTLV(response)
 
 			tlvs, err := bertlv.Decode(response)
 			if err != nil {
-				return models.Card{}, fmt.Errorf("Failed to decode READ RECORD response: %w", err)
+				return fmt.Errorf("Failed to decode READ RECORD response: %w", err)
 			}
 
-			var card, expiry, name string
-			if ctlv, ok := bertlv.FindFirstTag(tlvs, "5A"); ok {
-				cb, _, err := encoding.BCD.Decode(ctlv.Value, len(ctlv.Value)*2)
-				if err != nil {
-					return models.Card{}, fmt.Errorf("Failed to decode 5A tag value: %w", err)
-				}
-				card = string(cb)
-			}
-			if ctlv, ok := bertlv.FindFirstTag(tlvs, "5F20"); ok {
-				cn, _, err := encoding.ASCII.Decode(ctlv.Value, len(ctlv.Value))
-				if err != nil {
-					return models.Card{}, fmt.Errorf("Failed to decode 5F20 tag value: %w", err)
-				}
-				name = string(cn)
-			}
-			if ctlv, ok := bertlv.FindFirstTag(tlvs, "5F24"); ok {
-				ex, _, err := encoding.BCD.Decode(ctlv.Value, len(ctlv.Value)*2)
-				if err != nil {
-					return models.Card{}, fmt.Errorf("Failed to decode 5F25 tag value: %w", err)
-				}
-				expiry = string(ex)
+			bertlv.PrettyPrint(tlvs)
+
+			// find response message template 70
+			responseMessageTemplate, ok := bertlv.FindFirstTag(tlvs, "70")
+			if !ok {
+				return fmt.Errorf("Failed to find response message template (70) in READ RECORD response")
 			}
 
-			return models.Card{
-				CardHolderName: name,
-				Number:         card,
-				ExpirationDate: fmt.Sprintf("%s%s", expiry[2:], expiry[:2]), // MMYY format,
-			}, nil
+			for _, tlv := range responseMessageTemplate.TLVs {
+				card.TagsDB = append(card.TagsDB, tlv)
+			}
+
+			return nil
 		} else {
-			return models.Card{}, fmt.Errorf("READ RECORD command failed with status %02X%02X", sw1, sw2)
+			return fmt.Errorf("READ RECORD command failed with status %02X%02X", sw1, sw2)
 		}
 	}
-	return models.Card{}, fmt.Errorf("READ RECORD command response does not contain status word")
+
+	return fmt.Errorf("READ RECORD command response does not contain status word")
 }

@@ -1,7 +1,6 @@
 package issuer
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -119,7 +118,9 @@ func (i *Service) AuthorizeRequest(req models.AuthorizationRequest) (models.Auth
 		slog.Int64("amount", req.Amount),
 		slog.String("currency", req.Currency),
 		slog.String("merchant", req.Merchant.Name),
-		slog.String("chip data", hex.EncodeToString(req.EMVPayload)),
+		slog.String("pan", req.Card.Number),
+		slog.String("expiration date", req.Card.ExpirationDate),
+		slog.String("card holder name", req.Card.CardHolderName),
 	)
 
 	card, err := i.repo.FindCardForAuthorization(req.Card)
