@@ -10,6 +10,7 @@ type AuthorizationRequest struct {
 	ExpirationDate        string               `index:"9"`
 	AcceptorInformation   *AcceptorInformation `index:"10"`
 	STAN                  string               `index:"11"`
+	ChipData              []byte               `index:"55"`
 }
 
 type AuthorizationResponse struct {

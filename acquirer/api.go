@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/go-chi/chi/v5"
+	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"golang.org/x/exp/slog"
 )
 
@@ -64,6 +64,12 @@ func (a *API) createPayment(w http.ResponseWriter, r *http.Request) {
 	payment, err := a.acquirer.CreatePayment(merchantID, create)
 	if err != nil {
 		a.logger.Error("failed to create payment", "err", err)
+
+		if errors.Is(err, ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

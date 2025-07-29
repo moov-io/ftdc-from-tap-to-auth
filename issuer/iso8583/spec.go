@@ -120,6 +120,12 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 			Enc:         encoding.ASCII,
 			Pref:        prefix.ASCII.Fixed,
 		}),
+		55: field.NewBinary(&field.Spec{
+			Length:      999,
+			Description: "Chip Data",
+			Pref:        prefix.ASCII.LLL,
+			Enc:         encoding.Binary,
+		}),
 	},
 }
 

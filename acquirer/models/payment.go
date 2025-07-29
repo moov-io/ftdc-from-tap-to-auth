@@ -3,9 +3,10 @@ package models
 import "time"
 
 type CreatePayment struct {
-	Amount   int64
-	Currency string
-	Card     Card
+	Amount     int64
+	Currency   string
+	Card       Card
+	EMVPayload []byte
 }
 
 type PaymentStatus string

@@ -10,9 +10,10 @@ import (
 
 	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
 	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
+
 	// "github.com/moov-io/ftdc-from-tap-to-auth/issuer"
-	issuer8583 "github.com/moov-io/ftdc-from-tap-to-auth/issuer/iso8583"
 	"github.com/go-chi/chi/v5"
+	issuer8583 "github.com/moov-io/ftdc-from-tap-to-auth/issuer/iso8583"
 	"golang.org/x/exp/slog"
 )
 
@@ -50,7 +51,7 @@ func (a *App) Start() error {
 	router.Use(middleware.NewStructuredLogger(a.logger))
 	repository := NewRepository()
 	cp := cardpersonalizer.New(a.config.CardPersonalizerAddr)
-	iss := NewService(repository, cp)
+	iss := NewService(a.logger, repository, cp)
 
 	iso8583Server := issuer8583.NewServer(a.logger, a.config.ISO8583Addr, iss)
 	err := iso8583Server.Start()
