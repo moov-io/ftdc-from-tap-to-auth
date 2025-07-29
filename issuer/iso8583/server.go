@@ -127,9 +127,8 @@ func (s *Server) handleAuthorizationRequest(c *iso8583Connection.Connection, mes
 		Amount:   requestData.Amount,
 		Currency: requestData.Currency,
 		Card: models.Card{
-			Number:                requestData.PrimaryAccountNumber,
-			ExpirationDate:        requestData.ExpirationDate,
-			CardVerificationValue: requestData.CardVerificationValue,
+			Number:         requestData.PrimaryAccountNumber,
+			ExpirationDate: requestData.ExpirationDate,
 		},
 		Merchant: models.Merchant{
 			Name:       requestData.AcceptorInformation.Name,
@@ -137,6 +136,10 @@ func (s *Server) handleAuthorizationRequest(c *iso8583Connection.Connection, mes
 			PostalCode: requestData.AcceptorInformation.PostalCode,
 			WebSite:    requestData.AcceptorInformation.WebSite,
 		},
+	}
+
+	if requestData.ChipData != nil {
+		authRequest.EMVPayload = requestData.ChipData
 	}
 
 	// we define a variable that will hold the response data

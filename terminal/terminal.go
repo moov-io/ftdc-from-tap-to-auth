@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/client"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/paycard"
@@ -23,19 +24,24 @@ func NewTerminal(cfg *Config) (*Terminal, error) {
 func (t *Terminal) Run() error {
 	fmt.Println("FTDC Terminal is running...")
 
-	fmt.Println("Please enter amount (in cents, e.g., 100 for $1.00):")
-
 	var amount int64
-	_, err := fmt.Scanf("%d", &amount)
-	if err != nil {
-		return fmt.Errorf("failed to read amount: %w", err)
+	if t.config.DefaultAmount != 0 {
+		amount = t.config.DefaultAmount
+		fmt.Printf("Using default amount: %d cents\n", t.config.DefaultAmount)
+	} else {
+		fmt.Println("Please enter amount (in cents, e.g., 100 for $1.00):")
+
+		_, err := fmt.Scanf("%d", &amount)
+		if err != nil {
+			return fmt.Errorf("failed to read amount: %w", err)
+		}
+
+		if amount <= 0 {
+			return fmt.Errorf("amount must be greater than 0")
+		}
 	}
 
-	if amount <= 0 {
-		return fmt.Errorf("amount must be greater than 0")
-	}
-
-	err = t.run(amount)
+	err := t.run(amount)
 	if err != nil {
 		return fmt.Errorf("running terminal: %w", err)
 	}
@@ -123,39 +129,44 @@ func (t *Terminal) run(amount int64) error {
 			fmt.Println("Failed to process AFL:", err)
 			os.Exit(1)
 		}
-	} else {
-		fmt.Println("No AFL found, trying READ RECORD command 00:B2:01:0C...")
+	}
 
-		card, err := cardReader.ReadRecord(emvCard)
-		if err != nil {
-			fmt.Println("Failed to read record:", err)
-			os.Exit(1)
-		}
+	fmt.Println("Tags from card:")
 
-		err = t.createPayment(
-			amount,
-			card,
-		)
-		if err != nil {
-			fmt.Println("Failed to create payment:", err)
-			os.Exit(1)
-		}
+	bertlv.PrettyPrint(emvCard.TagsDB)
+
+	err = t.createPayment(amount, emvCard.TagsDB)
+	if err != nil {
+		return fmt.Errorf("creating payment: %w", err)
 	}
 
 	return nil
 
 }
 
-func (t *Terminal) createPayment(amount int64, card models.Card) error {
+const (
+	panTag            = "5A"
+	expDateTag        = "5F24"
+	cardHolderNameTag = "5F20"
+)
+
+func (t *Terminal) createPayment(amount int64, tags []bertlv.TLV) error {
 	fmt.Println("Sending payment request to acquirer...")
+
+	paymentTags := bertlv.CopyTags(tags, []string{panTag, expDateTag, cardHolderNameTag}...)
+
+	emvPayload, err := bertlv.Encode(paymentTags)
+	if err != nil {
+		return fmt.Errorf("encoding EMV payload: %w", err)
+	}
 
 	merchant := client.New(t.config.AcquirerURL)
 	payment, err := merchant.CreatePayment(
 		t.config.MerchantID,
 		models.CreatePayment{
-			Amount:   amount,
-			Currency: "USD",
-			Card:     card,
+			Amount:     amount,
+			Currency:   "USD",
+			EMVPayload: emvPayload,
 		},
 	)
 	if err != nil {

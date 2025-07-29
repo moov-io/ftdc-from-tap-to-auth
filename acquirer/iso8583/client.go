@@ -52,25 +52,28 @@ func (c *Client) Connect() error {
 	return nil
 }
 
-func (c *Client) AuthorizePayment(payment *models.Payment, card models.Card, merchant models.Merchant) (models.AuthorizationResponse, error) {
+func (c *Client) AuthorizePayment(payment *models.Payment, create models.CreatePayment, merchant models.Merchant) (models.AuthorizationResponse, error) {
 	c.logger.Info("authorizing payment", slog.String("payment_id", payment.ID))
 
 	requestMessage := iso8583.NewMessage(spec)
 	requestData := &AuthorizationRequest{
-		MTI:                   "0100",
-		PrimaryAccountNumber:  card.Number,
-		Amount:                payment.Amount,
-		Currency:              payment.Currency,
-		TransmissionDateTime:  payment.CreatedAt.UTC().Format(time.RFC3339),
-		STAN:                  c.stanGenerator.Next(),
-		CardVerificationValue: card.CardVerificationValue,
-		ExpirationDate:        card.ExpirationDate,
+		MTI:                  "0100",
+		PrimaryAccountNumber: create.Card.Number,
+		Amount:               payment.Amount,
+		Currency:             payment.Currency,
+		TransmissionDateTime: payment.CreatedAt.UTC().Format(time.RFC3339),
+		STAN:                 c.stanGenerator.Next(),
+		ExpirationDate:       create.Card.ExpirationDate,
 		AcceptorInformation: &AcceptorInformation{
 			Name:       merchant.Name,
 			MCC:        merchant.MCC,
 			PostalCode: merchant.PostalCode,
 			WebSite:    merchant.WebSite,
 		},
+	}
+
+	if create.EMVPayload != nil {
+		requestData.ChipData = create.EMVPayload
 	}
 
 	err := requestMessage.Marshal(requestData)

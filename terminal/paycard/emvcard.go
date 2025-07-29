@@ -20,6 +20,9 @@ type EmvCard struct {
 	TwoPayResponse          TwoPayResponse
 	GPOResponse             GPOResponse
 	SFIResponse             SFIResponse
+
+	// List of all tags read from the card
+	TagsDB []bertlv.TLV
 }
 
 // TwoPayResponse represents the structure of an EMV card 2PAY.SYS.DDF01 response.
@@ -529,6 +532,7 @@ func (e *EmvCard) ParseSFI(data []byte) error {
 		return fmt.Errorf("failed to find read record response message template tag 70")
 	}
 	for _, tag := range response.TLVs {
+		e.TagsDB = append(e.TagsDB, tag)
 		switch tag.Tag {
 		case "9F6C":
 			sfiresponse.CTQ = tag.Value

@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	ReaderIndex int    `yaml:"reader_index"` // Index of reader to use, -1 for interactive selection
-	MerchantID  string `yaml:"merchant_id"`  // ID of merchant to create payment for
-	AcquirerURL string `yaml:"acquirer_url"` // URL of the acquirer service
+	ReaderIndex   int    `yaml:"reader_index"`   // Index of reader to use, -1 for interactive selection
+	MerchantID    string `yaml:"merchant_id"`    // ID of merchant to create payment for
+	AcquirerURL   string `yaml:"acquirer_url"`   // URL of the acquirer service
+	DefaultAmount int64  `yaml:"default_amount"` // Default amount for payments
 }
 
 func NewConfigFromFile(filePath string) (*Config, error) {

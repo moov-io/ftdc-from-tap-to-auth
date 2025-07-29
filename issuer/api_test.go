@@ -7,9 +7,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
-	"github.com/go-chi/chi/v5"
+	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,7 +18,7 @@ import (
 func TestAPI(t *testing.T) {
 	router := chi.NewRouter()
 
-	api := issuer.NewAPI(issuer.NewService(issuer.NewRepository(), nil))
+	api := issuer.NewAPI(issuer.NewService(log.New(), issuer.NewRepository(), nil))
 	api.AppendRoutes(router)
 
 	t.Run("create account", func(t *testing.T) {

@@ -1,6 +1,7 @@
 package issuer
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -10,15 +11,18 @@ import (
 	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
 	cpm "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
+	"golang.org/x/exp/slog"
 )
 
 type Service struct {
+	logger           *slog.Logger
 	repo             *Repository
 	cardpersonalizer *cardpersonalizer.Client
 }
 
-func NewService(repo *Repository, cardpersonalizer *cardpersonalizer.Client) *Service {
+func NewService(logger *slog.Logger, repo *Repository, cardpersonalizer *cardpersonalizer.Client) *Service {
 	return &Service{
+		logger:           logger,
 		repo:             repo,
 		cardpersonalizer: cardpersonalizer,
 	}
@@ -108,6 +112,16 @@ func (i *Service) ListTransactions(accountID string) ([]*models.Transaction, err
 }
 
 func (i *Service) AuthorizeRequest(req models.AuthorizationRequest) (models.AuthorizationResponse, error) {
+	// we can do whatever we want here with EMVPayload
+	// req.EMVPayload => ...
+	i.logger.Info(
+		"authorizing request",
+		slog.Int64("amount", req.Amount),
+		slog.String("currency", req.Currency),
+		slog.String("merchant", req.Merchant.Name),
+		slog.String("chip data", hex.EncodeToString(req.EMVPayload)),
+	)
+
 	card, err := i.repo.FindCardForAuthorization(req.Card)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {

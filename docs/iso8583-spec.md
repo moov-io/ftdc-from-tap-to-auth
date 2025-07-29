@@ -79,6 +79,15 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Encoding**: ASCII
 - **Description**: Authorization approval code
 
+**List of approval codes:**
+* 00 - Approved
+* 05 - Declined
+* 10 - Invalid Request
+* 14 - Invalid Card
+* 51 - Insufficient Funds
+* 99 - System Error
+
+
 ### Field 6 - Authorization Code
 - **Type**: String
 - **Length**: 6 characters (fixed)
@@ -145,6 +154,13 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Length**: 6 characters (fixed)
 - **Encoding**: ASCII
 - **Description**: Unique sequence number for transaction tracking
+
+### Field 55 - Chip Data
+- **Type**: Binary
+- **Length**: Variable (up to 999 bytes)
+- **Encoding**: Binary
+- **Length Prefix**: LLL (3-digit length indicator)
+- **Description**: Contains EMV chip data for card transactions
 
 ## Encoding Notes
 

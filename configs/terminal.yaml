@@ -1,2 +1,4 @@
-merchantID: "merchant_id_here"
-acquirerURL: "http://127.0.0.1:8080"
+merchant_id: "a89528e7-97fa-46b7-99f4-3337b9dfc18b"
+acquirer_url: "http://127.0.0.1:8080"
+default_amount: 199
+
