@@ -256,7 +256,7 @@ func (s *Service) PersonalizeCard(cardReq models.CardRequest) (models.CardRespon
 		return models.CardResponse{}, fmt.Errorf("flashing card: %w", err)
 	}
 
-	s.cardReader, err = emv.NewCardReader()
+	s.cardReader, err = terminal.NewCardReader()
 	if err != nil {
 		return models.CardResponse{}, fmt.Errorf("recreating card reader: %w", err)
 	}
