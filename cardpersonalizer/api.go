@@ -40,7 +40,7 @@ func (a *API) personalizeCard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultChan := a.cardpersonalizer.SubmitCardRequest(create)
+	resultChan := a.cardpersonalizer.EnqueueCardRequest(create)
 	result := <-resultChan
 	if result.Err != nil {
 		http.Error(w, result.Err.Error(), http.StatusInternalServerError)

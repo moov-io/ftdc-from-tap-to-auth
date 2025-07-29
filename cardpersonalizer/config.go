@@ -7,8 +7,8 @@ type Config struct {
 
 func DefaultConfig() *Config {
 	return &Config{
-		HTTPAddr:   "127.0.0.1:7070",
-		CardReader: "ACS ACR1252 Dual Reader PICC",
-		//CardReader: "ACS ACR122U PICC Interface",
+		HTTPAddr:   "0.0.0.0:7070",
+		CardReader: "ACR1252 Dual Reader PICC",
+		//CardReader: "ACR122U PICC Interface",
 	}
 }

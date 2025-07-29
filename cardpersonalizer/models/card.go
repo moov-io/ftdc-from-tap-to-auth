@@ -3,9 +3,24 @@ package models
 import (
 	"regexp"
 
-	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/card"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/card"
 )
+
+// JobState represents the state of a card personalization job
+type JobState string
+
+const (
+	JobStateQueue   JobState = "queue"
+	JobStateProcess JobState = "process"
+	JobStateDone    JobState = "done"
+)
+
+// CardJob represents a card personalization job
+type CardJob struct {
+	Name  string   `json:"name"`
+	State JobState `json:"state"`
+}
 
 // CardRequest represents the request body for forging a card
 type CardRequest struct {
@@ -24,7 +39,7 @@ func (c CardRequest) Validate() error {
 	}
 
 	return validation.ValidateStruct(&c,
-		validation.Field(&c.Name, validation.Required, validation.Length(1, 50)),
+		validation.Field(&c.Name, validation.Required, validation.Length(1, 26)),
 		validation.Field(&c.PAN, validation.Length(13, 19), validation.Match(regexp.MustCompile(`^[0-9]*$`))),
 		validation.Field(&c.ExpiryDate, validation.Required, validation.Match(regexp.MustCompile(`^(0[1-9]|1[0-2])([0-9]{2})$`)).Error("must be in MMYY format")),
 		validation.Field(&c.PIN, validation.Required, validation.Length(4, 4), validation.Match(regexp.MustCompile(`^[0-9]*$`))),

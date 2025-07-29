@@ -27,8 +27,8 @@ function CardQueue() {
         // Initial fetch
         fetchQueue();
 
-        // Set up periodic updates every 5 seconds
-        const interval = setInterval(fetchQueue, 5000);
+        // Set up periodic updates every 3 seconds
+        const interval = setInterval(fetchQueue, 3000);
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
@@ -61,11 +61,24 @@ function CardQueue() {
         return <div className="empty-state">No cards in queue</div>;
     }
 
+    const getJobClassName = (state) => {
+        switch (state) {
+            case 'queue':
+                return 'queue-item job-queue';
+            case 'process':
+                return 'queue-item job-process';
+            case 'done':
+                return 'queue-item job-done';
+            default:
+                return 'queue-item job-queue';
+        }
+    };
+
     return (
         <div>
-            {queue.map((jobName, index) => (
-                <div key={index} className="queue-item">
-                    {jobName}
+            {queue.map((job, index) => (
+                <div key={index} className={getJobClassName(job.state)}>
+                    {job.name}
                 </div>
             ))}
         </div>
