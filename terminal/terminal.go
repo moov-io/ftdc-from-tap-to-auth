@@ -2,7 +2,6 @@ package terminal
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/moov-io/bertlv"
@@ -41,9 +40,21 @@ func (t *Terminal) Run() error {
 		}
 	}
 
-	err := t.run(amount)
+	emvTags, err := t.processTransaction(amount)
 	if err != nil {
 		return fmt.Errorf("running terminal: %w", err)
+	}
+
+	fmt.Println("*********************************************")
+	fmt.Println("EMV Tags read from card:")
+
+	bertlv.PrettyPrint(emvTags)
+	fmt.Println("*********************************************")
+
+	// Send payment request to the acquirer
+	err = t.createPayment(amount, emvTags)
+	if err != nil {
+		return fmt.Errorf("creating payment: %w", err)
 	}
 
 	// Implementation of terminal run logic
@@ -51,14 +62,14 @@ func (t *Terminal) Run() error {
 	return nil
 }
 
-func (t *Terminal) run(amount int64) error {
+func (t *Terminal) processTransaction(amount int64) ([]bertlv.TLV, error) {
 	// create a new terminal
 	terminal, err := paycard.NewTerminal(
 		paycard.WithCountryCode("0840"),  // USA
 		paycard.WithCurrencyCode("0840"), // USD
 	)
 	if err != nil {
-		return fmt.Errorf("creating terminal: %w", err)
+		return nil, fmt.Errorf("creating terminal: %w", err)
 	}
 
 	// create a new session for this card transaction
@@ -71,16 +82,14 @@ func (t *Terminal) run(amount int64) error {
 	// Establish context with PC/SC reader
 	cardReader, err := NewCardReader()
 	if err != nil {
-		fmt.Println("Failed to create card reader:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("creating card reader: %w", err)
 	}
 
 	if t.config.ReaderIndex < 0 {
 		cardReader.DisplayReaders()
 		_, err = cardReader.SelectReader()
 		if err != nil {
-			fmt.Println("selecting reader:", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("selecting card reader: %w", err)
 		}
 	} else if t.config.ReaderIndex >= 0 && t.config.ReaderIndex < len(cardReader.Readers) {
 		cardReader.SelectedReader = cardReader.Readers[t.config.ReaderIndex]
@@ -94,8 +103,7 @@ func (t *Terminal) run(amount int64) error {
 
 	err = cardReader.ConnectToCard()
 	if err != nil {
-		fmt.Println("Failed to connect to card:", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("connecting to card: %w", err)
 	}
 
 	// We have a emvCard to start parsing
@@ -105,42 +113,29 @@ func (t *Terminal) run(amount int64) error {
 	if ppseSelected {
 		aid, err := cardReader.SelectAID(emvCard)
 		if err != nil {
-			fmt.Println("Failed to select AID:", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("selecting AID: %w", err)
 		}
 		session.AID = aid
 
 		err = cardReader.ProcessPDOL(emvCard, terminal, &session)
 		if err != nil {
-			fmt.Println("Failed to process PDOL:", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("processing PDOL: %w", err)
 		}
 	} else {
 		err = cardReader.DirectApplicationSelection(emvCard)
 		if err != nil {
-			fmt.Println("Failed to direct application selection:", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("direct application selection: %w", err)
 		}
 	}
 
 	if emvCard.GPOResponse.AFL != nil {
 		err = cardReader.ProcessAFL(emvCard)
 		if err != nil {
-			fmt.Println("Failed to process AFL:", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("processing AFL: %w", err)
 		}
 	}
 
-	fmt.Println("Tags from card:")
-
-	bertlv.PrettyPrint(emvCard.TagsDB)
-
-	err = t.createPayment(amount, emvCard.TagsDB)
-	if err != nil {
-		return fmt.Errorf("creating payment: %w", err)
-	}
-
-	return nil
+	return emvCard.TagsDB, nil
 
 }
 
