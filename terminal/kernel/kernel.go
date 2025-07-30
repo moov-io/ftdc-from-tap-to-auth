@@ -69,7 +69,7 @@ func (k *FTDCKernel) SelectApplication(aid []byte) error {
 	}
 
 	fmt.Printf("✅ Application %X - %s selected successfully\n", appID.Value, appLabel.Value)
-	fmt.Printf("✅ FCI response received for selected application\n", aid)
+	fmt.Printf("✅ FCI response received for selected application\n")
 	bertlv.PrettyPrint(fciTemplate)
 
 	return nil
