@@ -21,7 +21,7 @@ func NewTerminal(cfg *Config) (*Terminal, error) {
 }
 
 func (t *Terminal) Run() error {
-	fmt.Println("FTDC Terminal is running...")
+	fmt.Println("📱FTDC Terminal is running...")
 
 	var amount int64
 	if t.config.DefaultAmount != 0 {

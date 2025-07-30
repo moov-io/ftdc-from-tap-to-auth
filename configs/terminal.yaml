@@ -1,4 +1,4 @@
-merchant_id: "a89528e7-97fa-46b7-99f4-3337b9dfc18b"
+merchant_id: "f5a0f7a9-15fc-4ca0-9324-8d6fbcf548fa"
 acquirer_url: "http://127.0.0.1:8080"
-default_amount: 199
+default_amount: 0
 

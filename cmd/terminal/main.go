@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/config"
 	tm "github.com/moov-io/ftdc-from-tap-to-auth/terminal"
 )
 
@@ -18,7 +19,9 @@ func main() {
 
 func runTerminal() error {
 	// we should read the config and flags and pass them to the terminal
-	cfg, err := tm.NewConfigFromFile("configs/terminal.yaml")
+	cfg := &tm.Config{}
+
+	err := config.NewFromFile("configs/terminal.yaml", cfg)
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
 	}

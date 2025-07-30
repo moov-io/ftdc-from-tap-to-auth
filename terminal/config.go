@@ -1,12 +1,5 @@
 package terminal
 
-import (
-	"fmt"
-	"os"
-
-	"gopkg.in/yaml.v3"
-)
-
 type Config struct {
 	ReaderIndex   int    `yaml:"reader_index"`   // Index of reader to use, -1 for interactive selection
 	MerchantID    string `yaml:"merchant_id"`    // ID of merchant to create payment for
@@ -14,16 +7,11 @@ type Config struct {
 	DefaultAmount int64  `yaml:"default_amount"` // Default amount for payments
 }
 
-func NewConfigFromFile(filePath string) (*Config, error) {
-	config := &Config{}
-
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read config file: %w", err)
+func DefaultConfig() *Config {
+	return &Config{
+		ReaderIndex:   -1,                      // Use interactive selection by default
+		MerchantID:    "",                      // No default merchant ID
+		AcquirerURL:   "http://localhost:8080", // Default URL for acquirer service
+		DefaultAmount: 100,                     // Default amount of 1.00 in minor units (e.g., cents)
 	}
-	err = yaml.Unmarshal(content, config)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config file: %w", err)
-	}
-	return config, nil
 }
