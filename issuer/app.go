@@ -50,7 +50,7 @@ func (a *App) Start() error {
 	router := chi.NewRouter()
 	router.Use(middleware.NewStructuredLogger(a.logger))
 	repository := NewRepository()
-	cp := cardpersonalizer.New(a.config.CardPersonalizerAddr)
+	cp := cardpersonalizer.New(a.config.CardPersonalizerURL)
 	iss := NewService(a.logger, repository, cp)
 
 	iso8583Server := issuer8583.NewServer(a.logger, a.config.ISO8583Addr, iss)

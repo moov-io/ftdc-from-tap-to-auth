@@ -5,15 +5,24 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/config"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer"
 	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 )
 
 func main() {
-	logger := log.New()
-	app := issuer.NewApp(logger, issuer.DefaultConfig())
+	cfg := &issuer.Config{}
 
-	err := app.Start()
+	err := config.NewFromFile("configs/issuer.yaml", cfg)
+	if err != nil {
+		log.New().Error("Error loading config", "err", err)
+		os.Exit(1)
+	}
+
+	logger := log.New()
+	app := issuer.NewApp(logger, cfg)
+
+	err = app.Start()
 	if err != nil {
 		logger.Error("Error starting app", "err", err)
 		os.Exit(1)
