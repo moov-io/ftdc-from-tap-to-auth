@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "08892340-6d12-497f-8e4d-22033bebd89f",
+		"name": "Issuer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4941396",
+		"_collection_link": "https://www.postman.com/lively-station-742249/workspace/cardflow-playground/collection/4941396-08892340-6d12-497f-8e4d-22033bebd89f?action=share&source=collection_link&creator=4941396"
+	},
+	"item": [
+		{
+			"name": "Create account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.globals.set(\"accountID\", pm.response.json().id);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Balance\": 5000,\n    \"Currency\": \"USD\",\n    \"Owner\": \"Pablo Gabriel\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuerBaseURL}}/accounts",
+					"host": [
+						"{{issuerBaseURL}}"
+					],
+					"path": [
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{issuerBaseURL}}/accounts/{{accountID}}",
+					"host": [
+						"{{issuerBaseURL}}"
+					],
+					"path": [
+						"accounts",
+						"{{accountID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Issue card",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"set card data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.globals.set(\"cardNumber\", jsonData.Number);",
+							"    pm.globals.set(\"cardExpirationDate\", jsonData.ExpirationDate);",
+							"    pm.globals.set(\"cardCardVerificationValue\", jsonData.CardVerificationValue);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"expiry\": \"0935\",\n    \"pin\": \"2233\",\n    \"cvv\": \"1234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuerBaseURL}}/accounts/{{accountID}}/cards?flashCard=true",
+					"host": [
+						"{{issuerBaseURL}}"
+					],
+					"path": [
+						"accounts",
+						"{{accountID}}",
+						"cards"
+					],
+					"query": [
+						{
+							"key": "flashCard",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{issuerBaseURL}}/accounts/{{accountID}}/transactions",
+					"host": [
+						"{{issuerBaseURL}}"
+					],
+					"path": [
+						"accounts",
+						"{{accountID}}",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
