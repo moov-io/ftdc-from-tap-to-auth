@@ -135,3 +135,12 @@ func (a *Service) GetPayment(merchantID, paymentID string) (*models.Payment, err
 
 	return payment, nil
 }
+
+func (a *Service) GetPayments(merchantID string) ([]*models.Payment, error) {
+	payments, err := a.repo.GetPayments(merchantID)
+	if err != nil {
+		return nil, fmt.Errorf("getting payments: %w", err)
+	}
+
+	return payments, nil
+}

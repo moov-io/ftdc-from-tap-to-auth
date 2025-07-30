@@ -28,6 +28,7 @@ func (a *API) AppendRoutes(r chi.Router) {
 		r.Route("/{merchantID}", func(r chi.Router) {
 			r.Post("/payments", a.createPayment)
 			r.Get("/payments/{paymentID}", a.getPayment)
+			r.Get("/payments", a.getPayments)
 		})
 	})
 }
@@ -96,4 +97,22 @@ func (a *API) getPayment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(payment)
+}
+
+func (a *API) getPayments(w http.ResponseWriter, r *http.Request) {
+	merchantID := chi.URLParam(r, "merchantID")
+
+	payments, err := a.acquirer.GetPayments(merchantID)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(payments)
 }

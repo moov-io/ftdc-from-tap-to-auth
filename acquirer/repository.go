@@ -68,3 +68,17 @@ func (r *Repository) GetPayment(merchantID, paymentID string) (*models.Payment, 
 
 	return payment, nil
 }
+
+func (r *Repository) GetPayments(merchantID string) ([]*models.Payment, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var payments []*models.Payment
+	for _, payment := range r.payments {
+		if payment.MerchantID == merchantID {
+			payments = append(payments, payment)
+		}
+	}
+
+	return payments, nil
+}
