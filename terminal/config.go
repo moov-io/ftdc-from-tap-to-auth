@@ -5,6 +5,7 @@ type Config struct {
 	MerchantID    string `yaml:"merchant_id"`    // ID of merchant to create payment for
 	AcquirerURL   string `yaml:"acquirer_url"`   // URL of the acquirer service
 	DefaultAmount int64  `yaml:"default_amount"` // Default amount for payments
+	Kernel        string `yaml:"kernel"`         // Kernel type to use, e.g., "universal" or "ftdc"
 }
 
 func DefaultConfig() *Config {
@@ -13,5 +14,6 @@ func DefaultConfig() *Config {
 		MerchantID:    "",                      // No default merchant ID
 		AcquirerURL:   "http://localhost:8080", // Default URL for acquirer service
 		DefaultAmount: 100,                     // Default amount of 1.00 in minor units (e.g., cents)
+		Kernel:        "ftdc",                  // Default kernel type
 	}
 }

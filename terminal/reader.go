@@ -42,6 +42,20 @@ func NewCardReader() (*CardReader, error) {
 	}, nil
 }
 
+func (c *CardReader) SendAPDU(cmd []byte) ([]byte, error) {
+	// Ensure the card is connected
+	if c.Card == nil {
+		return nil, fmt.Errorf("no card connected")
+	}
+
+	response, err := c.Card.Transmit(cmd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send APDU command: %w", err)
+	}
+
+	return response, nil
+}
+
 func (c *CardReader) Close() error {
 	if c.Card != nil {
 		if err := c.Card.Disconnect(scard.LeaveCard); err != nil {

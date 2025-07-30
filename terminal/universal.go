@@ -5,22 +5,10 @@ import (
 	"time"
 
 	"github.com/moov-io/bertlv"
-	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/client"
-	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/paycard"
 )
 
-type Terminal struct {
-	config *Config
-}
-
-func NewTerminal(cfg *Config) (*Terminal, error) {
-	return &Terminal{
-		config: cfg,
-	}, nil
-}
-
-func (t *Terminal) Run() error {
+func (t *Terminal) RunUniversalKernel() error {
 	fmt.Println("📱FTDC Terminal is running...")
 
 	var amount int64
@@ -143,42 +131,4 @@ func (t *Terminal) processTransaction(amount int64) ([]bertlv.TLV, error) {
 
 	return emvCard.TagsDB, nil
 
-}
-
-const (
-	panTag            = "5A"
-	expDateTag        = "5F24"
-	cardHolderNameTag = "5F20"
-)
-
-func (t *Terminal) createPayment(amount int64, tags []bertlv.TLV) error {
-	fmt.Println("Sending payment request to acquirer...")
-
-	paymentTags := bertlv.CopyTags(tags, []string{panTag, expDateTag, cardHolderNameTag}...)
-
-	emvPayload, err := bertlv.Encode(paymentTags)
-	if err != nil {
-		return fmt.Errorf("encoding EMV payload: %w", err)
-	}
-
-	merchant := client.New(t.config.AcquirerURL)
-	payment, err := merchant.CreatePayment(
-		t.config.MerchantID,
-		models.CreatePayment{
-			Amount:     amount,
-			Currency:   "USD",
-			EMVPayload: emvPayload,
-		},
-	)
-	if err != nil {
-		return fmt.Errorf("creating payment: %w", err)
-	}
-
-	fmt.Printf("Payment created successfully: ID=%s, Status=%s, Authorization Code=%s\n",
-		payment.ID,
-		payment.Status,
-		payment.AuthorizationCode,
-	)
-
-	return nil
 }
