@@ -1,4 +1,4 @@
 http_addr: localhost:9090
 iso8583_addr: localhost:8583
-# card_personalizer_url: http://localhost:7070
-card_personalizer_url: https://ftdc-card-maker.ngrok.io
+card_personalizer_url: http://localhost:7070
+# card_personalizer_url: https://ftdc-card-maker.ngrok.io
