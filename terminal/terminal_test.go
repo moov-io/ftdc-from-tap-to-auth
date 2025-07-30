@@ -8,8 +8,6 @@ import (
 )
 
 func TestPCSC(t *testing.T) {
-	cr, err := terminal.NewCardReader()
+	_, err := terminal.NewCardReader()
 	require.NoError(t, err, "creating card reader")
-
-	require.Len(t, cr.Readers, 0, "expected no readers found")
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -18,12 +19,20 @@ func main() {
 }
 
 func runTerminal() error {
+	// kernel flag
+	kernel := flag.String("kernel", "", "Kernel to use for the terminal (e.g., 'universal' or 'ftdc')")
+	flag.Parse()
+
 	// we should read the config and flags and pass them to the terminal
 	cfg := &tm.Config{}
 
 	err := config.NewFromFile("configs/terminal.yaml", cfg)
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
+	}
+
+	if *kernel != "" {
+		cfg.Kernel = *kernel
 	}
 
 	terminal, err := tm.NewTerminal(cfg)
