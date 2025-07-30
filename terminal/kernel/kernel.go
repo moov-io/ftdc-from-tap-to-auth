@@ -52,7 +52,25 @@ func (k *FTDCKernel) SelectApplication(aid []byte) error {
 		return fmt.Errorf("failed to select application %X: %w", aid, resp.Error())
 	}
 
-	fmt.Printf("✅ Application %X selected successfully\n", aid)
+	// parse response
+	fciTemplate, err := bertlv.Decode(resp.Data)
+	if err != nil {
+		return fmt.Errorf("parsing FCI response: %w", err)
+	}
+
+	appID, found := bertlv.FindFirstTag(fciTemplate, "84")
+	if found {
+		k.TagsDB = append(k.TagsDB, appID)
+	}
+
+	appLabel, found := bertlv.FindFirstTag(fciTemplate, "50")
+	if found {
+		k.TagsDB = append(k.TagsDB, appLabel)
+	}
+
+	fmt.Printf("✅ Application %X - %s selected successfully\n", appID.Value, appLabel.Value)
+	fmt.Printf("✅ FCI response received for selected application\n", aid)
+	bertlv.PrettyPrint(fciTemplate)
 
 	return nil
 }
@@ -74,13 +92,13 @@ func (k *FTDCKernel) readRecords() error {
 		return fmt.Errorf("READ RECORD command failed: %w", resp.Error())
 	}
 
-	fmt.Printf("✅ READ RECORD successful\n")
-
 	// Parse the TLV response
 	tlvs, err := bertlv.Decode(resp.Data)
 	if err != nil {
 		return fmt.Errorf("failed to decode READ RECORD response: %w", err)
 	}
+	fmt.Printf("✅ READ RECORD successful\n")
+	bertlv.PrettyPrint(tlvs)
 
 	responseMessageTemplate, found := bertlv.FindFirstTag(tlvs, "70")
 	if !found {

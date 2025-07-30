@@ -122,12 +122,20 @@ const (
 	panTag            = "5A"
 	expDateTag        = "5F24"
 	cardHolderNameTag = "5F20"
+	appIDTag          = "84"
+	appLabelTag       = "50"
 )
 
 func (t *Terminal) createPayment(amount int64, tags []bertlv.TLV) error {
 	fmt.Println("Sending payment request to acquirer...")
 
-	paymentTags := bertlv.CopyTags(tags, []string{panTag, expDateTag, cardHolderNameTag}...)
+	paymentTags := bertlv.CopyTags(tags, []string{
+		panTag,
+		expDateTag,
+		cardHolderNameTag,
+		appIDTag,
+		appLabelTag,
+	}...)
 
 	emvPayload, err := bertlv.Encode(paymentTags)
 	if err != nil {

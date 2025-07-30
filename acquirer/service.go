@@ -46,9 +46,11 @@ func (a *Service) CreateMerchant(create models.CreateMerchant) (*models.Merchant
 }
 
 type card struct {
-	PAN            string `bertlv:"5A"`
-	ExpirationDate string `bertlv:"5F24"` // YYMMDD format
-	CardholderName string `bertlv:"5F20,ascii"`
+	PAN              string `bertlv:"5A"`
+	ExpirationDate   string `bertlv:"5F24"` // YYMMDD format
+	CardholderName   string `bertlv:"5F20,ascii"`
+	ApplicationID    string `bertlv:"84"`       // AID
+	ApplicationLabel string `bertlv:"50,ascii"` // Application label
 }
 
 func (a *Service) CreatePayment(merchantID string, create models.CreatePayment) (*models.Payment, error) {
@@ -79,6 +81,8 @@ func (a *Service) CreatePayment(merchantID string, create models.CreatePayment) 
 			slog.String("card holder", c.CardholderName),
 			slog.String("pan", c.PAN),
 			slog.String("expiration date", c.ExpirationDate),
+			slog.String("application id", c.ApplicationID),
+			slog.String("application label", c.ApplicationLabel),
 		)
 
 		payment.Card = models.SafeCard{
