@@ -1,17 +1,23 @@
-![Go Tests](https://github.com/alovak/cardflow-playground/actions/workflows/go.yml/badge.svg)
-
-# CardFlow Playground
+# Fintech DevCon From Tap To Auth
 
 A learning environment for exploring card [acquiring](https://moov.io/resources/dictionary/#acquirer) and [issuing](https://moov.io/resources/dictionary/#issuer) systems built with Go.
 
+## For Participants
+
+Please, read instructions to be prepared for the workshop:
+
+[Instructions](./setup.md)
+
 ## Overview
 
-CardFlow Playground consists of two main applications:
+FTDC Playground consists of:
 
 1. Issuer: Manages accounts, cards, and transactions.
 2. Acquirer: Manages merchants and processes payments.
+3. Terminal: reads cards using NFC and sends payment requests to the Acquirer.
+4. Card Personalizer: Writes Java Card Application (JCA) to NFC cards.
 
-Both applications communicate using the [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) standard, leveraging the following Go packages for efficient message handling and network management:
+Issuer and Acquirer communicate using the [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) standard, leveraging the following Go packages for efficient message handling and network management:
 
 * [moov-io/iso8583](https://github.com/moov-io/iso8583) - A Golang library for packing and unpacking ISO 8583 messages, providing a seamless way to work with the standard message format.
 * [moov-io/iso8583-connection](https://github.com/moov-io/iso8583-connection) - A Golang library that streamlines network management for ISO 8583, handling crucial tasks such as connection establishment, TLS configuration, heartbeat/echo/idle messaging, and request processing. Additionally, it features a connection pool with a re-connect capability to enhance reliability and performance.
@@ -157,6 +163,9 @@ The directory structure for issuer and acquirer is outlined below:
 - Install PC/SC lite package
   - Debian/Ubuntu: `sudo apt-get install pcscd libpcsclite-dev`
   - MacOS: `brew install pcsc-lite`
+
+Only if you have NFC card writer:
+
 - Install Java Development Kit (JDK) 11
   - Debian/Ubuntu: `sudo apt install openjdk-11-jdk`
   - MacOS: `brew install openjdk@11`
