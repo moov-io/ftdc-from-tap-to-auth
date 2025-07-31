@@ -20,8 +20,6 @@
 
    There should be no errors. If you encounter issues, please let us know via FTDC App.
 
-## API Testing Setup
-
 ### Postman Installation
 1. Download and install [Postman Desktop App](https://www.postman.com/downloads/) - the online version does not support localhost requests, so you must use the desktop app.
 
