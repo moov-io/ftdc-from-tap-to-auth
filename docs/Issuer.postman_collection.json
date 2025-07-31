@@ -102,7 +102,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{issuerBaseURL}}/accounts/{{accountID}}/cards?flashCard=true",
+					"raw": "{{issuerBaseURL}}/accounts/{{accountID}}/cards",
 					"host": [
 						"{{issuerBaseURL}}"
 					],
@@ -110,12 +110,6 @@
 						"accounts",
 						"{{accountID}}",
 						"cards"
-					],
-					"query": [
-						{
-							"key": "flashCard",
-							"value": "true"
-						}
 					]
 				}
 			},
