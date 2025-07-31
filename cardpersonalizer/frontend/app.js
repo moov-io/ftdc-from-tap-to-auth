@@ -61,26 +61,61 @@ function CardQueue() {
         return <div className="empty-state">No cards in queue</div>;
     }
 
-    const getJobClassName = (state) => {
+    const getJobWrapperClassName = (state) => {
         switch (state) {
             case 'queue':
-                return 'queue-item job-queue';
+                return 'queue-item job-queue-wrapper';
             case 'process':
-                return 'queue-item job-process';
+                return 'queue-item job-process-wrapper';
             case 'done':
-                return 'queue-item job-done';
+                return 'queue-item job-done-wrapper';
             default:
-                return 'queue-item job-queue';
+                return 'queue-item job-queue-wrapper';
         }
     };
 
+    const getJobClassName = (state) => {
+        switch (state) {
+            case 'queue':
+                return 'job-queue';
+            case 'process':
+                return 'job-process';
+            case 'done':
+                return 'job-done';
+            default:
+                return 'job-queue';
+        }
+    };
+
+
+    const getAnomationClassName = (state) => {
+        switch (state) {
+            case 'queue':
+                return 'job-queue-animation';
+            case 'process':
+                return 'job-process-animation';
+            case 'done':
+                return 'job-done-animation';
+            default:
+                return 'job-queue-animation';
+        }
+    };
+
+
     return (
         <div>
-            {queue.map((job, index) => (
-                <div key={index} className={getJobClassName(job.state)}>
-                    {job.name}
-                </div>
-            ))}
+            {queue.map((job, index) => {
+                const maxLength = 16;
+                return (
+                    <div key={index} className={getJobWrapperClassName(job.state)}>
+                        <div className={getAnomationClassName(job.state)}>
+                            <div className={getJobClassName(job.state)}>
+                                {job.name.length > maxLength ? job.name.substring(0, maxLength) + '...' : job.name}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
         </div>
     );
 }
