@@ -22,7 +22,7 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 }
 ```
 
-composite field example:
+## Composite field example:
 
 ```
 field.NewComposite(&field.Spec{
@@ -44,5 +44,32 @@ field.NewComposite(&field.Spec{
     },
 }),
 ```
+
+## Request and Response Data Types
+
+```
+type AuthorizationRequest struct {
+	MTI                   string        `iso8583:"0"`
+	PAN                   string        `iso8583:"2"`
+    // ...
+	AcceptorInfo          *AcceptorInfo `iso8583:"10"`
+	STAN                  string        `iso8583:"11"`
+}
+
+type AcceptorInfo struct {
+	MerchantName string `iso8583:"01"`
+    // ...
+}
+
+type AuthorizationResponse struct {
+	MTI               string `iso8583:"0"`
+	ApprovalCode      string `iso8583:"5"`
+	AuthorizationCode string `iso8583:"6"`
+}
+
+```
+
+
+
 
 
