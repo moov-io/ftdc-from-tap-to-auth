@@ -25,7 +25,7 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 		1: field.NewBitmap(&field.Spec{
 			Length:      8,
 			Description: "Bitmap",
-			Enc:         encoding.Binary,
+			Enc:         encoding.BytesToASCIIHex,
 			Pref:        prefix.Binary.Fixed,
 		}),
 		2: field.NewString(&field.Spec{

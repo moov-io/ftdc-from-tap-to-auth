@@ -13,39 +13,28 @@ This specification defines a simplified ISO 8583 message format for educational 
 
 ## Message Types
 
-### 0100 - Authorization Request
+### 0100 / 0110 - Authorization Request / Response
 
-| Field | Element Name | Req/Opt | Format | Length | Description |
+| Field | Element Name | Req/Resp | Format | Length | Description |
 |-------|--------------|---------|---------|---------|-------------|
-| 0 | Message Type Indicator | R | ANS | 4 | Fixed: "0100" |
-| 1 | Bitmap | R | B | 8 | Presence indicator |
-| 2 | Primary Account Number (PAN) | R | ANS | 16 | Card number |
-| 3 | Amount | R | N | 6 | Transaction amount |
-| 4 | Transmission Date & Time | R | ANS | 20 | Message timestamp |
-| 7 | Currency | R | ANS | 3 | Currency code |
-| 8 | Card Verification Value (CVV) | O | ANS | 4 | Security code |
-| 9 | Card Expiration Date | R | ANS | 4 | Card expiry |
-| 10 | Acceptor Information | O | COMP | VAR | Merchant details |
-| 11 | Systems Trace Audit Number (STAN) | R | ANS | 6 | Trace number |
+| 0 | Message Type Indicator | Req | ANS | 4 | Fixed: "0100" |
+| 1 | Bitmap | Req / Res | B, HEX | 8 | Presence indicator |
+| 2 | Primary Account Number (PAN) | Req | ANS | 16 | Card number |
+| 3 | Amount | Req | N | 6 | Transaction amount |
+| 4 | Transmission Date & Time | Req | ANS | 20 | Message timestamp |
+| 5 | Approval Code | Resp | ANS | 2 | Authorization result |
+| 6 | Authorization Code | Resp | ANS | 6 | Issuer auth code |
+| 7 | Currency | Req | ANS | 3 | Currency code |
+| 8 | Card Verification Value (CVV) | Req | ANS | 4 | Security code |
+| 9 | Card Expiration Date | Req | ANS | 4 | Card expiry |
+| 10 | Acceptor Information | Req | COMP | VAR | Merchant details |
+| 11 | Systems Trace Audit Number (STAN) | Req / Res | ANS | 6 | Trace number |
+| 55 | Chip Data | Req | B | 999 | EMV chip data |
 
 ### 0110 - Authorization Response
 
-| Field | Element Name | Req/Opt | Format | Length | Description |
-|-------|--------------|---------|---------|---------|-------------|
-| 0 | Message Type Indicator | R | ANS | 4 | Fixed: "0110" |
-| 1 | Bitmap | R | B | 8 | Presence indicator |
-| 2 | Primary Account Number (PAN) | R | ANS | 16 | Card number |
-| 3 | Amount | R | N | 6 | Transaction amount |
-| 4 | Transmission Date & Time | R | ANS | 20 | Message timestamp |
-| 5 | Approval Code | O | ANS | 2 | Authorization result |
-| 6 | Authorization Code | O | ANS | 6 | Issuer auth code |
-| 7 | Currency | R | ANS | 3 | Currency code |
-| 9 | Card Expiration Date | O | ANS | 4 | Card expiry |
-| 10 | Acceptor Information | O | COMP | VAR | Merchant details |
-| 11 | Systems Trace Audit Number (STAN) | R | ANS | 6 | Trace number |
-
 **Legend:**
-- R = Required, O = Optional
+- Req = Request, Resp = Response
 - ANS = Alphanumeric and Special, N = Numeric, B = Binary, COMP = Composite
 - VAR = Variable length
 
@@ -60,7 +49,7 @@ This specification defines a simplified ISO 8583 message format for educational 
 ### Field 1 - Bitmap
 - **Type**: Bitmap
 - **Length**: 8 bytes (fixed)
-- **Encoding**: Binary
+- **Encoding**: HEX(ASCII)
 - **Description**: Indicates which data elements are present in the message
 
 ### Field 2 - Primary Account Number (PAN)
@@ -93,7 +82,7 @@ This specification defines a simplified ISO 8583 message format for educational 
 * 00 - Approved
 * 05 - Declined
 * 10 - Invalid Request
-* 14 - Invalid Card
+* 14 - Invalid/Unknown Card
 * 51 - Insufficient Funds
 * 99 - System Error
 
@@ -120,7 +109,7 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Type**: String
 - **Length**: 4 characters (fixed)
 - **Encoding**: ASCII
-- **Description**: Card expiration date
+- **Description**: Card expiration date, formatted as YYMM (e.g., 2401 for January 2024)
 
 ### Field 10 - Acceptor Information
 - **Type**: Composite
@@ -172,3 +161,22 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Length Prefix**: LLL (3-digit length indicator)
 - **Description**: Contains EMV chip data for card transactions
 
+## Network Connection
+
+### Transport Protocol
+The client should establish a TCP connection to the server/issuer for message transmission.
+
+### Message Framing
+Each ISO 8583 message must be prefixed with a **message length header**:
+- **Size**: 2 bytes
+- **Encoding**: Big-endian binary
+- **Content**: Length of the ISO 8583 message payload (excluding the header itself)
+
+### Example
+For a 45-byte ISO 8583 authorization request:
+```
+Request:  [0x00, 0x2D][45 bytes of ISO 8583 message]
+Response: [0x00, 0x1F][31 bytes of ISO 8583 response]
+```
+
+The length header allows the receiver to know exactly how many bytes to read for the complete message, enabling proper message boundary detection over the TCP stream.
