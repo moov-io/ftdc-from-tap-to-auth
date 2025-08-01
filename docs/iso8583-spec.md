@@ -2,6 +2,15 @@
 
 This specification defines a simplified ISO 8583 message format for educational and demonstration purposes at [Fintech DevCon](https://fintechdevcon.io).
 
+## Encoding Notes
+
+- **ASCII**: Standard ASCII character encoding for all alphanumeric and special characters
+- **Binary**: Raw binary data encoding
+- **Fixed Length**: Field has a predetermined, unchanging length
+- **Variable Length**: Field length is indicated by a length prefix
+  - **LL**: 2-digit decimal length indicator
+  - **LLL**: 3-digit decimal length indicator
+
 ## Message Types
 
 ### 0100 - Authorization Request
@@ -72,6 +81,7 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Length**: 20 characters (fixed)
 - **Encoding**: ASCII
 - **Description**: Date and time when the message was transmitted
+- **Format**: YYYY-MM-DDTHH:MM:SSZ (UTC time), in Go - time.RFC3339. Example: `2009-11-10T23:00:00Z`
 
 ### Field 5 - Approval Code
 - **Type**: String
@@ -162,11 +172,3 @@ This specification defines a simplified ISO 8583 message format for educational 
 - **Length Prefix**: LLL (3-digit length indicator)
 - **Description**: Contains EMV chip data for card transactions
 
-## Encoding Notes
-
-- **ASCII**: Standard ASCII character encoding
-- **Binary**: Raw binary data encoding
-- **Fixed Length**: Field has a predetermined, unchanging length
-- **Variable Length**: Field length is indicated by a length prefix
-  - **LL**: 2-digit decimal length indicator
-  - **LLL**: 3-digit decimal length indicator
