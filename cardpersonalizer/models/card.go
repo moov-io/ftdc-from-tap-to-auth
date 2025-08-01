@@ -14,6 +14,7 @@ const (
 	JobStateQueue   JobState = "queue"
 	JobStateProcess JobState = "process"
 	JobStateDone    JobState = "done"
+	JobStateFailed  JobState = "failed"
 )
 
 // CardJob represents a card personalization job

@@ -130,9 +130,10 @@ func (s *Service) handleCardPresent(err error) {
 		s.mu.Lock()
 		s.logger.Error("waiting for card", slog.String("error", err.Error()))
 		s.state.jobQueue[0].Result <- CardResult{Err: err}
-		s.state.jobQueue[0].State = models.JobStateDone
+		s.state.jobQueue[0].State = models.JobStateFailed
 		s.mu.Unlock()
-		s.startNextJob()
+		// Wait for card to be removed before processing next job
+		s.state.cardRemovedChan = s.cardReader.WaitForCardRemoveAsync(time.Second * 5)
 		return
 	}
 
@@ -147,9 +148,10 @@ func (s *Service) handleCardPresent(err error) {
 		s.logger.Error("processing job", slog.String("job", s.state.jobQueue[0].Card.Name), slog.String("error", err.Error()))
 		s.mu.Lock()
 		s.state.jobQueue[0].Result <- CardResult{Err: err}
-		s.state.jobQueue[0].State = models.JobStateDone
+		s.state.jobQueue[0].State = models.JobStateFailed
 		s.mu.Unlock()
-		s.startNextJob()
+		// Wait for card to be removed before processing next job
+		s.state.cardRemovedChan = s.cardReader.WaitForCardRemoveAsync(time.Second * 5)
 		return
 	}
 

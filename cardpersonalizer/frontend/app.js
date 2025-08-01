@@ -69,6 +69,8 @@ function CardQueue() {
                 return 'queue-item job-process-wrapper';
             case 'done':
                 return 'queue-item job-done-wrapper';
+            case 'failed':
+                return 'queue-item job-failed-wrapper';
             default:
                 return 'queue-item job-queue-wrapper';
         }
@@ -82,6 +84,8 @@ function CardQueue() {
                 return 'job-process';
             case 'done':
                 return 'job-done';
+            case 'failed':
+                return 'job-failed';
             default:
                 return 'job-queue';
         }
@@ -96,6 +100,8 @@ function CardQueue() {
                 return 'job-process-animation';
             case 'done':
                 return 'job-done-animation';
+            case 'failed':
+                return 'job-failed-animation';
             default:
                 return 'job-queue-animation';
         }
