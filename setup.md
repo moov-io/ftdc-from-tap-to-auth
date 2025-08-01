@@ -33,6 +33,12 @@
    - Import Collection from the shared workspace: [CardFlow Playground](https://www.postman.com/lively-station-742249/cardflow-playground/overview)
 
 
+### Develper Environment
+
+If you plan to do coding excercises, we highly recommend setting up a local development environment with Go and Go LSP configured. If you are using VSCode, you may only need Go plugin installed (assuming you have Go installed already).
+
+If you are using another editor, please refer to the Go documentation for setting up your environment.
+
 ## Next Steps
 
 This is optional. Only if you're curious and have time.
