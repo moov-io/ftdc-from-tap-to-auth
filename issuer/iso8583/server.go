@@ -1,7 +1,9 @@
 package iso8583
 
 import (
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
@@ -48,6 +50,14 @@ func NewServer(logger *slog.Logger, addr string, authorizer Authorizer) *Server 
 
 		// here we define a function that will be called when a new message is received`
 		iso8583Connection.InboundMessageHandler(s.handleRequest),
+		iso8583Connection.ErrorHandler(func(err error) {
+			if errors.Is(err, io.EOF) {
+				s.logger.Info("connection closed by client")
+				return
+			}
+			// print error type
+			s.logger.Error("failed to handle message", slog.String("addr", s.Addr), slog.String("error", err.Error()))
+		}),
 	)
 
 	s.server = iso8583Server
