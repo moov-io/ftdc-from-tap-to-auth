@@ -24,7 +24,7 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 
 ## Composite field example:
 
-```
+```go
 field.NewComposite(&field.Spec{
     Length:      999,
     Description: "Acceptor Information",
@@ -47,7 +47,7 @@ field.NewComposite(&field.Spec{
 
 ## Request and Response Data Types
 
-```
+```go
 type AuthorizationRequest struct {
 	MTI                   string        `iso8583:"0"`
 	PAN                   string        `iso8583:"2"`
@@ -70,6 +70,28 @@ type AuthorizationResponse struct {
 ```
 
 
+## Printing ISO 8583 Messages
 
+```go
+iso8583.Describe(unpackedMsg, os.Stdout)
+```
 
+## Creating length header for writing
+
+```go
+// write message length as a 2-bytes header
+messageLength := len(packed)
+packedLength := make([]byte, 2)
+packedLength[0] = byte(messageLength >> 8) // high byte
+packedLength[1] = byte(messageLength)      // low byte
+```
+
+## Reading length header
+
+```go
+// read message length from the first 2 bytes
+// and convert it to an integer
+responseMessageLength := int(responseLength[0])<<8 | int(responseLength[1])
+responsePacked := make([]byte, responseMessageLength)
+```
 
