@@ -28,6 +28,10 @@ func NewService(logger *slog.Logger, repo *Repository, cardpersonalizer *cardper
 }
 
 func (i *Service) CreateAccount(req models.CreateAccount) (*models.Account, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validating request: %w", err)
+	}
+
 	account := &models.Account{
 		ID:               uuid.New().String(),
 		OwnerName:        req.OwnerName,
