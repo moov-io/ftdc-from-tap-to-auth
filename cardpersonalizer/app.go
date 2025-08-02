@@ -3,13 +3,13 @@ package cardpersonalizer
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"sync"
 
-	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
 	"github.com/go-chi/chi/v5"
-	"golang.org/x/exp/slog"
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
 )
 
 type App struct {

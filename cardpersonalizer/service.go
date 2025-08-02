@@ -3,6 +3,7 @@ package cardpersonalizer
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 	"sync"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/terminal"
 	"github.com/moov-io/iso8583/encoding"
-	"golang.org/x/exp/slog"
 )
 
 type CardJob struct {

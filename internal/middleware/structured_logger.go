@@ -5,11 +5,11 @@ package middleware
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
-	"golang.org/x/exp/slog"
 )
 
 func NewStructuredLogger(logger *slog.Logger) func(next http.Handler) http.Handler {

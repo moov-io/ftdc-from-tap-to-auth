@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"sync"
 
+	"github.com/go-chi/chi/v5"
 	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
 	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
-
-	// "github.com/moov-io/ftdc-from-tap-to-auth/issuer"
-	"github.com/go-chi/chi/v5"
 	issuer8583 "github.com/moov-io/ftdc-from-tap-to-auth/issuer/iso8583"
-	"golang.org/x/exp/slog"
 )
 
 // App is the main application, it contains all the components of the issuer service

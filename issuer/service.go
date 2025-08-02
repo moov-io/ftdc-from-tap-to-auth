@@ -3,6 +3,7 @@ package issuer
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"math/rand"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	cardpersonalizer "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/client"
 	cpm "github.com/moov-io/ftdc-from-tap-to-auth/cardpersonalizer/models"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
-	"golang.org/x/exp/slog"
 )
 
 type Service struct {

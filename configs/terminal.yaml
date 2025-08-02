@@ -1,4 +1,7 @@
-merchant_id: "fbb1fa24-7e5e-4014-97b4-cff6f55c90c3"
+merchant_id: "3fe02e9a-4e98-4b4c-bf6b-1d0bd433cfe0"
 acquirer_url: "http://127.0.0.1:8080"
 default_amount: 0
 kernel: ftdc # ftdc or universal
+printer_url: https://ftdc-printer.ngrok.io
+# for local testing, you can use:
+# printer_url: http://127.0.0.1:8085

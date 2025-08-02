@@ -3,6 +3,7 @@ package acquirer
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"sync"
@@ -10,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/iso8583"
 	"github.com/moov-io/ftdc-from-tap-to-auth/internal/middleware"
-	"golang.org/x/exp/slog"
 )
 
 // App is the main application, it contains all the components of the issuer service

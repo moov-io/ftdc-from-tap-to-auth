@@ -27,4 +27,5 @@ type Payment struct {
 	Status            PaymentStatus
 	CreatedAt         time.Time
 	AuthorizationCode string
+	ResponseCode      string
 }

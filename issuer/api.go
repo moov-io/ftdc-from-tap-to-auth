@@ -3,12 +3,12 @@ package issuer
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
-	"golang.org/x/exp/slog"
 )
 
 // API is a HTTP API for the issuer service

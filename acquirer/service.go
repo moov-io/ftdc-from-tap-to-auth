@@ -2,12 +2,12 @@ package acquirer
 
 import (
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
-	"golang.org/x/exp/slog"
 )
 
 type Service struct {
@@ -117,6 +117,7 @@ func (a *Service) CreatePayment(merchantID string, create models.CreatePayment) 
 	}
 
 	payment.AuthorizationCode = response.AuthorizationCode
+	payment.ResponseCode = response.ApprovalCode
 
 	if response.ApprovalCode == "00" {
 		payment.Status = models.PaymentStatusAuthorized

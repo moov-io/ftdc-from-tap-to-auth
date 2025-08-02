@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 
 	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 	"github.com/moov-io/iso8583"
 	iso8583Connection "github.com/moov-io/iso8583-connection"
 	iso8583Server "github.com/moov-io/iso8583-connection/server"
-	"golang.org/x/exp/slog"
 )
 
 // Server is a wrapper around the moov-io/iso8583-connection server.

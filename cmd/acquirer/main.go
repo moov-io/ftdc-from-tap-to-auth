@@ -1,16 +1,24 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/lmittmann/tint"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer"
-	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 )
 
 func main() {
-	logger := log.New()
+	logger := slog.New(
+		tint.NewHandler(os.Stdout, &tint.Options{
+			Level:      slog.LevelDebug,
+			TimeFormat: time.TimeOnly,
+		}),
+	)
+
 	app := acquirer.NewApp(logger, acquirer.DefaultConfig())
 
 	err := app.Start()

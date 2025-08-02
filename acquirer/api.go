@@ -3,11 +3,11 @@ package acquirer
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
-	"golang.org/x/exp/slog"
 )
 
 type API struct {
