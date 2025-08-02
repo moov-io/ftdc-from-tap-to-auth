@@ -1,12 +1,18 @@
 package terminal
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	"github.com/moov-io/bertlv"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/client"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
+	"github.com/moov-io/ftdc-from-tap-to-auth/printer"
 	"github.com/moov-io/ftdc-from-tap-to-auth/terminal/kernel"
 )
 
@@ -159,6 +165,76 @@ func (t *Terminal) createPayment(amount int64, tags []bertlv.TLV) error {
 		payment.ID,
 		payment.Status,
 		payment.AuthorizationCode,
+	)
+
+	err = t.printReceipt(payment, tags)
+	if err != nil {
+		return fmt.Errorf("printing receipt: %w", err)
+	}
+
+	return nil
+}
+
+func (t *Terminal) printReceipt(payment models.Payment, tags []bertlv.TLV) error {
+	if t.config.PrinterURL == "" {
+		fmt.Println("No printer configured, skipping receipt printing.")
+		return nil
+	}
+
+	var cardholder string
+
+	cardholderTag, ok := bertlv.FindFirstTag(tags, cardHolderNameTag)
+	if !ok {
+		cardholder = ""
+	} else {
+		cardholder = string(cardholderTag.Value)
+	}
+
+	receipt := printer.Receipt{
+		PaymentID:          payment.ID,
+		ProcessingDateTime: payment.CreatedAt,
+		PAN:                fmt.Sprintf("%s****%s", payment.Card.First6, payment.Card.Last4),
+		Cardholder:         cardholder,
+		Amount:             payment.Amount,
+		AuthorizationCode:  payment.AuthorizationCode,
+		ResponseCode:       payment.ResponseCode,
+	}
+
+	receiptJSON, err := json.Marshal(receipt)
+	if err != nil {
+		return fmt.Errorf("marshalling receipt: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/receipts", t.config.PrinterURL), bytes.NewReader(receiptJSON))
+	if err != nil {
+		return fmt.Errorf("creating request to printer: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("sending receipt to printer: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		responseBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("printer returned error: %s; status code: %d", responseBody, resp.StatusCode)
+	}
+
+	var printJob printer.PrintJob
+	err = json.NewDecoder(resp.Body).Decode(&printJob)
+	if err != nil {
+		return fmt.Errorf("decoding print job response: %w", err)
+	}
+
+	fmt.Println("Receipt printed successfully!")
+	fmt.Printf("Print Job: Number in Queue=%d, Waiting Time=%d seconds\n",
+		printJob.NumberInQueue,
+		printJob.WaitingTime,
 	)
 
 	return nil
