@@ -61,7 +61,7 @@ func (a *App) Start() error {
 	a.ISO8583ServerAddr = iso8583Server.Addr
 	a.iso8583Server = iso8583Server
 
-	api := NewAPI(iss)
+	api := NewAPI(a.logger, iss)
 	api.AppendRoutes(router)
 
 	l, err := net.Listen("tcp", a.config.HTTPAddr)

@@ -25,8 +25,9 @@ func TestEndToEndTransaction(t *testing.T) {
 
 	// Given: Create an account with $100 balance
 	accountID, err := issuerClient.CreateAccount(issuerModels.CreateAccount{
-		Balance:  100_00, // $100
-		Currency: "USD",
+		OwnerName: "John Doe",
+		Balance:   100_00, // $100
+		Currency:  "USD",
 	})
 	require.NoError(t, err)
 

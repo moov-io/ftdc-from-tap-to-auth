@@ -18,13 +18,14 @@ import (
 func TestAPI(t *testing.T) {
 	router := chi.NewRouter()
 
-	api := issuer.NewAPI(issuer.NewService(log.New(), issuer.NewRepository(), nil))
+	api := issuer.NewAPI(log.New(), issuer.NewService(log.New(), issuer.NewRepository(), nil))
 	api.AppendRoutes(router)
 
 	t.Run("create account", func(t *testing.T) {
 		create := models.CreateAccount{
-			Balance:  10_00,
-			Currency: "USD",
+			OwnerName: "John Doe",
+			Balance:   10_00,
+			Currency:  "USD",
 		}
 
 		jsonReq, _ := json.Marshal(create)

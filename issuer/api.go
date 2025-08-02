@@ -8,15 +8,18 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
+	"golang.org/x/exp/slog"
 )
 
 // API is a HTTP API for the issuer service
 type API struct {
+	logger *slog.Logger
 	issuer *Service
 }
 
-func NewAPI(issuer *Service) *API {
+func NewAPI(logger *slog.Logger, issuer *Service) *API {
 	return &API{
+		logger: logger,
 		issuer: issuer,
 	}
 }
@@ -37,12 +40,14 @@ func (a *API) createAccount(w http.ResponseWriter, r *http.Request) {
 	create := models.CreateAccount{}
 	err := json.NewDecoder(r.Body).Decode(&create)
 	if err != nil {
+		a.logger.Error("failed to decode create account request", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	account, err := a.issuer.CreateAccount(create)
 	if err != nil {
+		a.logger.Error("failed to create account", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
