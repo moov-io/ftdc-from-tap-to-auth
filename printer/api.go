@@ -1,4 +1,4 @@
-package main
+package printer
 
 import (
 	"encoding/json"

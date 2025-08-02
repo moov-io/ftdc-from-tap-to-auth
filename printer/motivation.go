@@ -1,4 +1,4 @@
-package main
+package printer
 
 var motivationalPhrases = []string{
 	"You are awesome!",

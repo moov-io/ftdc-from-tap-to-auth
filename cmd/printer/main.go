@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lmittmann/tint"
+	"github.com/moov-io/ftdc-from-tap-to-auth/printer"
 )
 
 func main() {
@@ -19,16 +20,16 @@ func main() {
 		}),
 	)
 
-	printer, err := NewThermalPrinter()
+	termPrinter, err := printer.NewThermalPrinter()
 	if err != nil {
 		log.Fatalf("Failed to initialize printer: %v", err)
 	}
-	defer printer.Close()
+	defer termPrinter.Close()
 
-	service := NewService(logger, printer) // Replace nil with actual printer initialization if needed
+	service := printer.NewService(logger, termPrinter) // Replace nil with actual printer initialization if needed
 	service.Start()
 
-	srv := NewServer(logger, service)
+	srv := printer.NewServer(logger, service)
 	srv.Start()
 
 	c := make(chan os.Signal, 1)
