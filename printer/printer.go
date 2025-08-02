@@ -164,6 +164,11 @@ func (tp *ThermalPrinter) Cut() error {
 
 func (tp *ThermalPrinter) PrintLines(lines []string) error {
 	for _, line := range lines {
+		// cut off the line if it exceeds 32 characters
+		if len(line) > 32 {
+			line = line[:32]
+		}
+
 		if err := tp.PrintLine(line); err != nil {
 			return fmt.Errorf("failed to print line '%s': %v", line, err)
 		}
