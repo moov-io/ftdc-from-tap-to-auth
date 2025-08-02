@@ -30,9 +30,9 @@ func NewService(logger *slog.Logger, printer *ThermalPrinter) *Service {
 	return &Service{
 		logger:        logger,
 		printer:       printer,
-		printingDelay: 5 * time.Second,      // default printing delay
-		printSignal:   make(chan bool, 500), // buffered channel to signal printing
-		done:          make(chan bool),      // channel to signal stopping the service
+		printingDelay: 5 * time.Second, // default printing delay
+		printSignal:   make(chan bool), // buffered channel to signal printing
+		done:          make(chan bool), // channel to signal stopping the service
 	}
 }
 
@@ -41,27 +41,32 @@ func (s *Service) PrintReceipt(receipt Receipt) (*PrintJob, error) {
 	defer s.mu.Unlock()
 
 	s.queue = append(s.queue, receipt)
-
 	jobs := len(s.queue)
+
 	waitingTime := (jobs - 1) * int(s.printingDelay.Seconds())
 
-	select {
-	case <-s.done:
-		s.logger.Info(
-			"Printing service is stopping, dropping receipt",
-			slog.String("payment_id", receipt.PaymentID),
-			slog.Int("number_in_queue", jobs),
-			slog.Int("waiting_time_seconds", waitingTime),
-		)
-		return nil, fmt.Errorf("printing service is stopping, receipt dropped")
-	case s.printSignal <- true:
-		s.logger.Info(
-			"Queuing receipt for printing",
-			slog.String("payment_id", receipt.PaymentID),
-			slog.Int("number_in_queue", jobs),
-			slog.Int("waiting_time_seconds", waitingTime),
-		)
-	}
+	s.logger.Info(
+		"Queuing receipt for printing",
+		slog.String("payment_id", receipt.PaymentID),
+		slog.Int("number_in_queue", jobs),
+		slog.Int("waiting_time_seconds", waitingTime),
+	)
+
+	s.wg.Add(1)
+	go func() {
+		defer s.wg.Done()
+
+		select {
+		case <-s.done:
+			s.logger.Info(
+				"Printing service is stopping, dropping receipt",
+				slog.String("payment_id", receipt.PaymentID),
+				slog.Int("number_in_queue", jobs),
+				slog.Int("waiting_time_seconds", waitingTime),
+			)
+		case s.printSignal <- true:
+		}
+	}()
 
 	return &PrintJob{
 		NumberInQueue: jobs,
