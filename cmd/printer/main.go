@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -20,13 +19,20 @@ func main() {
 		}),
 	)
 
-	termPrinter, err := printer.NewThermalPrinter()
+	var prntr printer.Printer
+	prntr, err := printer.NewThermalPrinter()
 	if err != nil {
-		log.Fatalf("Failed to initialize printer: %v", err)
+		logger.Warn("Failed to initialize thermal printer:", slog.String("error", err.Error()))
+		logger.Info("Falling back to mock printer...")
+		prntr, err = printer.NewMockPrinter()
+		if err != nil {
+			logger.Error("Failed to initialize mock printer:", slog.String("error", err.Error()))
+			os.Exit(1)
+		}
 	}
-	defer termPrinter.Close()
+	defer prntr.Close()
 
-	service := printer.NewService(logger, termPrinter) // Replace nil with actual printer initialization if needed
+	service := printer.NewService(logger, prntr)
 	service.Start()
 
 	srv := printer.NewServer(logger, service)

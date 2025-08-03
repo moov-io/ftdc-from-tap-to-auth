@@ -13,7 +13,7 @@ import (
 
 type Service struct {
 	logger  *slog.Logger
-	printer *ThermalPrinter
+	printer Printer
 
 	printingDelay time.Duration
 	mu            sync.Mutex // to protect the following fields
@@ -26,7 +26,7 @@ type Service struct {
 	done        chan bool // signal to stop printing
 }
 
-func NewService(logger *slog.Logger, printer *ThermalPrinter) *Service {
+func NewService(logger *slog.Logger, printer Printer) *Service {
 	return &Service{
 		logger:        logger,
 		printer:       printer,

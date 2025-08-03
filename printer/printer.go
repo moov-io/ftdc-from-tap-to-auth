@@ -24,6 +24,18 @@ var (
 	ESC_CUT      = []byte{0x1D, 0x56, 0x42, 0x00} // Cut paper
 )
 
+type Printer interface {
+	PrintText(text string) error
+	PrintLine(text string) error
+	PrintBold(text string) error
+	PrintTitle(title string) error
+	PrintCentered(text string) error
+	Feed(lines int) error
+	Cut() error
+	PrintLines(lines []string) error
+	Close() error
+}
+
 type ThermalPrinter struct {
 	ctx    *gousb.Context
 	device *gousb.Device
