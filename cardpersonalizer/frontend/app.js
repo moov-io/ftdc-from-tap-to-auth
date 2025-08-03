@@ -111,7 +111,7 @@ function CardQueue() {
     return (
         <div>
             {queue.map((job, index) => {
-                const maxLength = 16;
+                const maxLength = 14;
                 return (
                     <div key={index} className={getJobWrapperClassName(job.state)}>
                         <div className={getAnomationClassName(job.state)}>
