@@ -10,6 +10,7 @@ type Receipt struct {
 	Amount             int64     `json:"amount"`
 	AuthorizationCode  string    `json:"authorization_code"`
 	ResponseCode       string    `json:"response_code"`
+	Short              bool      `json:"short"`
 }
 
 // information about the printing job

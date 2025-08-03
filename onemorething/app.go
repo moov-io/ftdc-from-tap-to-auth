@@ -20,7 +20,11 @@ func NewApp(logger *slog.Logger, config *Config) *app {
 func (a *app) Start() {
 	a.logger.Info("Starting One More Thing ...")
 
-	a.iso8583Server = NewServer(a.logger, a.config.ServerAddr)
+	a.iso8583Server = NewServer(
+		a.logger,
+		a.config.ServerAddr,
+		a.config.PrinterURL,
+	)
 	err := a.iso8583Server.Start()
 	if err != nil {
 		a.logger.Error(

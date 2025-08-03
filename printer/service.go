@@ -139,9 +139,35 @@ func (s *Service) Stop() {
 }
 
 func (s *Service) printReceipt(receipt Receipt) error {
+	var err error
+
+	// printing only name
+	if receipt.Short {
+		name := receipt.Cardholder
+		if name == "" {
+			return nil
+		}
+
+		// 3 digits, hopefully, space and name - max 32 chars
+		if len(name) > 28 {
+			name = name[:28]
+		}
+
+		err = s.printer.PrintLine(name)
+		if err != nil {
+			return fmt.Errorf("printing line for %s: %w", name, err)
+		}
+		err = s.printer.Feed(1)
+		if err != nil {
+			return fmt.Errorf("error feeding paper: %w", err)
+		}
+
+		return nil
+	}
+
 	// TODO: try printing a logo
 
-	err := s.printer.PrintCentered("*** Fintech DevCon 2025 ***")
+	err = s.printer.PrintCentered("*** Fintech DevCon 2025 ***")
 	if err != nil {
 		return fmt.Errorf("error printing title: %w", err)
 	}

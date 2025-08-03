@@ -1,37 +1,45 @@
 package onemorething
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"sync"
+	"time"
 
+	"github.com/moov-io/ftdc-from-tap-to-auth/printer"
 	"github.com/moov-io/iso8583"
 	connection "github.com/moov-io/iso8583-connection"
 )
 
 type server struct {
-	logger  *slog.Logger
-	addr    string
-	wg      sync.WaitGroup
-	closed  chan bool
-	ln      net.Listener
-	mu      sync.Mutex
-	counter int
+	logger     *slog.Logger
+	addr       string
+	wg         sync.WaitGroup
+	closed     chan bool
+	ln         net.Listener
+	mu         sync.Mutex
+	counter    int
+	printerURL string
 }
 
-func NewServer(logger *slog.Logger, addr string) *server {
+func NewServer(logger *slog.Logger, addr, printerURL string) *server {
 	if addr == "" {
 		addr = ":"
 	}
 
 	return &server{
-		logger: logger,
-		closed: make(chan bool),
-		addr:   addr,
+		logger:     logger,
+		closed:     make(chan bool),
+		addr:       addr,
+		printerURL: printerURL,
 	}
 }
 
@@ -212,5 +220,61 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 
 	f.WriteString(fmt.Sprintf("%d - %s\n", s.counter, request.ParticipantName))
 
-	// TODO: send to printer service
+	err = s.printParticipant(request.ParticipantName)
+	if err != nil {
+		s.logger.Error(
+			"printing participant",
+			slog.String("error", err.Error()),
+		)
+		return
+	}
+}
+
+func (s *server) printParticipant(name string) error {
+	if s.printerURL == "" {
+		return fmt.Errorf("printer is not configured")
+	}
+
+	receipt := printer.Receipt{
+		Cardholder: name,
+		Short:      true,
+	}
+
+	receiptJSON, err := json.Marshal(receipt)
+	if err != nil {
+		return fmt.Errorf("marshalling receipt: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/receipts", s.printerURL), bytes.NewReader(receiptJSON))
+	if err != nil {
+		return fmt.Errorf("creating request to printer: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("sending receipt to printer: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		responseBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("printer returned error: %s; status code: %d", responseBody, resp.StatusCode)
+	}
+
+	var printJob printer.PrintJob
+	err = json.NewDecoder(resp.Body).Decode(&printJob)
+	if err != nil {
+		return fmt.Errorf("decoding print job response: %w", err)
+	}
+
+	s.logger.Info("printer job accepted",
+		slog.Int("queue", printJob.NumberInQueue),
+		slog.Int("waiting", printJob.WaitingTime),
+	)
+
+	return nil
 }
