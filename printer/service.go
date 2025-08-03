@@ -139,6 +139,8 @@ func (s *Service) Stop() {
 }
 
 func (s *Service) printReceipt(receipt Receipt) error {
+	// TODO: try printing a logo
+
 	err := s.printer.PrintCentered("*** Fintech DevCon 2025 ***")
 	if err != nil {
 		return fmt.Errorf("error printing title: %w", err)

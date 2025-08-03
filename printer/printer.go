@@ -188,6 +188,24 @@ func (tp *ThermalPrinter) PrintLines(lines []string) error {
 	return nil
 }
 
+func (tp *ThermalPrinter) PrintBitmapImage(bitmap *BitmapImage) error {
+	widthBytes := (bitmap.Width + 7) / 8
+
+	var command []byte
+
+	// ESC/POS command: GS v 0 (Print raster bit image)
+	// Format: 1D 76 30 00 [width_low] [width_high] [height_low] [height_high] [data...]
+	command = append(command, 0x1D, 0x76, 0x30, 0x00)
+	command = append(command, byte(widthBytes&0xFF))    // Width in bytes (low)
+	command = append(command, byte(widthBytes>>8))      // Width in bytes (high)
+	command = append(command, byte(bitmap.Height&0xFF)) // Height (low)
+	command = append(command, byte(bitmap.Height>>8))   // Height (high)
+	command = append(command, bitmap.Data...)           // Bitmap data
+
+	return tp.sendCommand(command)
+	return nil
+}
+
 func (tp *ThermalPrinter) Close() error {
 	if tp.intf != nil {
 		tp.intf.Close()
