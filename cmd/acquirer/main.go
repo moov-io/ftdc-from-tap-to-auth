@@ -9,6 +9,8 @@ import (
 
 	"github.com/lmittmann/tint"
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer"
+	"github.com/moov-io/ftdc-from-tap-to-auth/internal/config"
+	"github.com/moov-io/ftdc-from-tap-to-auth/log"
 )
 
 func main() {
@@ -19,9 +21,17 @@ func main() {
 		}),
 	)
 
-	app := acquirer.NewApp(logger, acquirer.DefaultConfig())
+	cfg := &acquirer.Config{}
 
-	err := app.Start()
+	err := config.NewFromFile("configs/acquirer.yaml", cfg)
+	if err != nil {
+		log.New().Error("Error loading config", "err", err)
+		os.Exit(1)
+	}
+
+	app := acquirer.NewApp(logger, cfg)
+
+	err = app.Start()
 	if err != nil {
 		logger.Error("Error starting app", "err", err)
 		os.Exit(1)

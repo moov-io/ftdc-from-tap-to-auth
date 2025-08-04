@@ -1,8 +1,8 @@
 package acquirer
 
 type Config struct {
-	HTTPAddr    string
-	ISO8583Addr string
+	HTTPAddr    string `yaml:"http_addr"`
+	ISO8583Addr string `yaml:"iso8583_addr"`
 }
 
 func DefaultConfig() *Config {

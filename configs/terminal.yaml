@@ -1,4 +1,4 @@
-merchant_id: "3fe02e9a-4e98-4b4c-bf6b-1d0bd433cfe0"
+merchant_id: "ac92d523-7ec3-4353-b504-66b19073be4d"
 acquirer_url: "http://127.0.0.1:8080"
 default_amount: 0
 kernel: ftdc # ftdc or universal

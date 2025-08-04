@@ -16,7 +16,8 @@ issuer:
 
 .PHONY: card-personalizer
 card-personalizer:
-	go run cmd/cardpersonalizer/main.go
+	JAVA_HOME=/opt/homebrew/opt/openjdk@11 go run ./cmd/cardpersonalizer
+	# go run cmd/cardpersonalizer/main.go
 
 .PHONY: printer
 printer:
@@ -40,6 +41,7 @@ presenter-issuer:
 	@echo "Starting ngrok and issuer..."
 	@trap 'kill 0' INT; \
 	ngrok http --domain=ftdc-issuer.ngrok.io --log=stdout 2>&1 9090 2>&1 & \
+	ngrok tcp --region=us --remote-addr=5.tcp.ngrok.io:27433 --log=stdout 2>&1 8583 2>&1 & \
 	go run cmd/issuer/main.go 2>&1 & \
 	wait
 
@@ -48,7 +50,7 @@ presenter-card-personalizer:
 	@echo "Starting ngrok and issuer..."
 	@trap 'kill 0' INT; \
 	ngrok http --domain=ftdc-card-maker.ngrok.io --log=stdout 2>&1 7070 2>&1 & \
-	go run cmd/cardpersonalizer/main.go 2>&1 & \
+	JAVA_HOME=/opt/homebrew/opt/openjdk@11 go run cmd/cardpersonalizer/main.go 2>&1 & \
 	wait
 
 .PHONY: presenter-printer

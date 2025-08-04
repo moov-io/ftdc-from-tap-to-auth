@@ -48,11 +48,17 @@ func (a *App) Start() error {
 	router := chi.NewRouter()
 	router.Use(middleware.NewStructuredLogger(a.logger))
 	repository := NewRepository()
+
+	err := repository.LoadFromFile()
+	if err != nil {
+		return fmt.Errorf("loading repository from file: %w", err)
+	}
+
 	cp := cardpersonalizer.New(a.config.CardPersonalizerURL)
 	iss := NewService(a.logger, repository, cp)
 
 	iso8583Server := issuer8583.NewServer(a.logger, a.config.ISO8583Addr, iss)
-	err := iso8583Server.Start()
+	err = iso8583Server.Start()
 	if err != nil {
 		return fmt.Errorf("starting iso8583 server: %w", err)
 	}
@@ -85,6 +91,7 @@ func (a *App) Start() error {
 			a.logger.Info("http server stopped")
 		}
 
+		repository.SaveToFile()
 		a.wg.Done()
 	}()
 

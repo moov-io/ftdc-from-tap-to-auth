@@ -1,13 +1,20 @@
 package acquirer
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/moov-io/ftdc-from-tap-to-auth/acquirer/models"
 )
 
 var ErrNotFound = fmt.Errorf("not found")
+
+type persistedData struct {
+	Merchants map[string]*models.Merchant `json:"merchants"`
+	Payments  map[string]*models.Payment  `json:"payments"`
+}
 
 type Repository struct {
 	mu sync.RWMutex
@@ -81,4 +88,56 @@ func (r *Repository) GetPayments(merchantID string) ([]*models.Payment, error) {
 	}
 
 	return payments, nil
+}
+
+const filename = "db/acquirer_data.json"
+
+func (r *Repository) SaveToFile() error {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	data := persistedData{
+		Merchants: r.merchants,
+		Payments:  r.payments,
+	}
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filename, jsonData, 0644)
+}
+
+func (r *Repository) LoadFromFile() error {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // File doesn't exist yet, that's okay
+		}
+		return err
+	}
+
+	var persisted persistedData
+	if err := json.Unmarshal(data, &persisted); err != nil {
+		return err
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	// Initialize maps if they're nil
+	if persisted.Merchants != nil {
+		r.merchants = persisted.Merchants
+	} else {
+		r.merchants = make(map[string]*models.Merchant)
+	}
+
+	if persisted.Payments != nil {
+		r.payments = persisted.Payments
+	} else {
+		r.payments = make(map[string]*models.Payment)
+	}
+
+	return nil
 }

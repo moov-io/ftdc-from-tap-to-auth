@@ -1,13 +1,21 @@
 package issuer
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/moov-io/ftdc-from-tap-to-auth/issuer/models"
 )
 
 var ErrNotFound = fmt.Errorf("not found")
+
+type persistedData struct {
+	Cards        []*models.Card        `json:"cards"`
+	Accounts     []*models.Account     `json:"accounts"`
+	Transactions []*models.Transaction `json:"transactions"`
+}
 
 type Repository struct {
 	Cards        []*models.Card
@@ -111,4 +119,48 @@ func (r *Repository) ListTransactions(accountID string) ([]*models.Transaction, 
 	}
 
 	return transactions, nil
+}
+
+const filename = "db/issuer_data.json"
+
+func (r *Repository) SaveToFile() error {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	data := persistedData{
+		Cards:        r.Cards,
+		Accounts:     r.Accounts,
+		Transactions: r.Transactions,
+	}
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filename, jsonData, 0644)
+}
+
+func (r *Repository) LoadFromFile() error {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // File doesn't exist yet, that's okay
+		}
+		return err
+	}
+
+	var persisted persistedData
+	if err := json.Unmarshal(data, &persisted); err != nil {
+		return err
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.Cards = persisted.Cards
+	r.Accounts = persisted.Accounts
+	r.Transactions = persisted.Transactions
+
+	return nil
 }

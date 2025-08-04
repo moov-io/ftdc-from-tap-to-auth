@@ -46,6 +46,10 @@ func (a *App) Start() error {
 	router.Use(middleware.NewStructuredLogger(a.logger))
 
 	repository := NewRepository()
+	err := repository.LoadFromFile()
+	if err != nil {
+		return fmt.Errorf("loading repository from file: %w", err)
+	}
 
 	// setup iso8583Client
 	stanGenerator := iso8583.NewStanGenerator()
@@ -86,6 +90,7 @@ func (a *App) Start() error {
 			a.logger.Info("http server stopped")
 		}
 
+		repository.SaveToFile()
 		a.wg.Done()
 	}()
 

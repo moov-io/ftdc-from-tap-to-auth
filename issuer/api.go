@@ -85,6 +85,7 @@ func (a *API) issueCard(w http.ResponseWriter, r *http.Request) {
 	if flashCard != "" {
 		shouldFlash, err = strconv.ParseBool(flashCard)
 		if err != nil {
+			a.logger.Error("invalid flashCard parameter", slog.Any("error", err))
 			http.Error(w, "Invalid flashCard parameter", http.StatusBadRequest)
 			return
 		}
@@ -94,10 +95,12 @@ func (a *API) issueCard(w http.ResponseWriter, r *http.Request) {
 	if shouldFlash {
 		err := json.NewDecoder(r.Body).Decode(&cardRequest)
 		if err != nil {
+			a.logger.Error("failed to decode card request", slog.Any("error", err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		if err := cardRequest.Validate(); err != nil {
+			a.logger.Error("invalid card request", slog.Any("error", err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -105,6 +108,7 @@ func (a *API) issueCard(w http.ResponseWriter, r *http.Request) {
 
 	card, err := a.issuer.IssueCard(accountID, cardRequest, shouldFlash)
 	if err != nil {
+		a.logger.Error("failed to issue card", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -119,6 +123,7 @@ func (a *API) getTransactions(w http.ResponseWriter, r *http.Request) {
 
 	transactions, err := a.issuer.ListTransactions(accountID)
 	if err != nil {
+		a.logger.Error("failed to list transactions", slog.Any("error", err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -134,6 +139,7 @@ func (a *API) getAccounts(w http.ResponseWriter, _ *http.Request) {
 		if errors.Is(err, ErrNotFound) {
 			http.Error(w, err.Error(), http.StatusNotFound)
 		} else {
+			a.logger.Error("failed to get accounts", slog.Any("error", err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
