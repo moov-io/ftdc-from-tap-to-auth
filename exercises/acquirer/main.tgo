@@ -199,7 +199,7 @@ func main() {
 	fmt.Printf("Packed ISO 8583 Message:\n%s\n", packed)
 
 	// 7. connect to the FTDC Issuer and send the message
-	conn, err := net.Dial("tcp", "localhost:8583")
+	conn, err := net.Dial("tcp", "5.tcp.ngrok.io:27433")
 	if err != nil {
 		fmt.Printf("Error connecting to FTDC Issuer: %v\n", err)
 		return
