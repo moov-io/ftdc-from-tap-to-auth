@@ -14,7 +14,7 @@ require (
 	github.com/lmittmann/tint v1.1.2
 	github.com/moov-io/bertlv v0.1.0
 	github.com/moov-io/iso8583 v0.23.4
-	github.com/moov-io/iso8583-connection v0.3.1
+	github.com/moov-io/iso8583-connection v0.8.4-0.20250803173227-7d21e87b2b84
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.26.0
 	gopkg.in/yaml.v3 v3.0.1
