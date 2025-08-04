@@ -1,0 +1,5 @@
+http_addr: 127.0.0.1:8080
+# for local issuer
+iso8583_addr: 127.0.0.1:8583
+# for centralized issuer
+# iso8583_addr: 5.tcp.ngrok.io:27433
