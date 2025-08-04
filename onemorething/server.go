@@ -244,7 +244,7 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 
 	f.WriteString(fmt.Sprintf("%d - %s\n", s.counter, request.ParticipantName))
 
-	err = s.printParticipant(request.ParticipantName)
+	err = s.printParticipant(request, response)
 	if err != nil {
 		s.logger.Error(
 			"printing participant",
@@ -254,7 +254,7 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 	}
 }
 
-func (s *server) printParticipant(request requestData, response responseData) error {
+func (s *server) printParticipant(request *requestData, response *responseData) error {
 	if s.printerURL == "" {
 		return fmt.Errorf("printer is not configured")
 	}
