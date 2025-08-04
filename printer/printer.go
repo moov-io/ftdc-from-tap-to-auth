@@ -33,7 +33,9 @@ type Printer interface {
 	Feed(lines int) error
 	Cut() error
 	PrintLines(lines []string) error
+
 	Close() error
+	PrintBitmapImage(bitmap *BitmapImage) error
 }
 
 type ThermalPrinter struct {
@@ -193,6 +195,8 @@ func (tp *ThermalPrinter) PrintBitmapImage(bitmap *BitmapImage) error {
 
 	var command []byte
 
+	tp.sendCommand(ESC_ALIGN_C)
+
 	// ESC/POS command: GS v 0 (Print raster bit image)
 	// Format: 1D 76 30 00 [width_low] [width_high] [height_low] [height_high] [data...]
 	command = append(command, 0x1D, 0x76, 0x30, 0x00)
@@ -202,8 +206,9 @@ func (tp *ThermalPrinter) PrintBitmapImage(bitmap *BitmapImage) error {
 	command = append(command, byte(bitmap.Height>>8))   // Height (high)
 	command = append(command, bitmap.Data...)           // Bitmap data
 
+	tp.sendCommand(ESC_ALIGN_L)
+
 	return tp.sendCommand(command)
-	return nil
 }
 
 func (tp *ThermalPrinter) Close() error {

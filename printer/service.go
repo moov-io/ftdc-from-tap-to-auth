@@ -165,11 +165,19 @@ func (s *Service) printReceipt(receipt Receipt) error {
 		return nil
 	}
 
-	// TODO: try printing a logo
-
-	err = s.printer.PrintCentered("*** Fintech DevCon 2025 ***")
+	logo, err := NewLogoBitmap()
 	if err != nil {
-		return fmt.Errorf("error printing title: %w", err)
+		s.logger.Error("error creating logo bitmap", slog.String("error", err.Error()))
+
+		err = s.printer.PrintCentered("*** Fintech DevCon 2025 ***")
+		if err != nil {
+			return fmt.Errorf("error printing title: %w", err)
+		}
+	} else {
+		err = s.printer.PrintBitmapImage(logo)
+		if err != nil {
+			fmt.Printf("error printing logo bitmap: %v\n", err)
+		}
 	}
 
 	err = s.printer.Feed(1)

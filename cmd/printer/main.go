@@ -20,7 +20,9 @@ func main() {
 	)
 
 	var prntr printer.Printer
-	prntr, err := printer.NewThermalPrinter()
+	var err error
+
+	prntr, err = printer.NewThermalPrinter()
 	if err != nil {
 		logger.Warn("Failed to initialize thermal printer:", slog.String("error", err.Error()))
 		logger.Info("Falling back to mock printer...")

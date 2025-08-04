@@ -139,7 +139,7 @@ func (p *MockPrinter) PrintCentered(text string) error {
 }
 
 func (p *MockPrinter) Feed(lines int) error {
-	for i := 0; i < lines; i++ {
+	for range lines {
 		if err := p.sendCommand(ESC_FEED); err != nil {
 			return err
 		}
@@ -162,6 +162,11 @@ func (p *MockPrinter) PrintLines(lines []string) error {
 			return fmt.Errorf("failed to print line '%s': %v", line, err)
 		}
 	}
+	return nil
+}
+
+func (p *MockPrinter) PrintBitmapImage(bitmap *BitmapImage) error {
+	p.PrintLine("IMAGE PLACEHOLDER")
 	return nil
 }
 
