@@ -16,6 +16,7 @@ FTDC Playground consists of:
 2. Acquirer: Manages merchants and processes payments.
 3. Terminal: reads cards using NFC and sends payment requests to the Acquirer.
 4. Card Personalizer: Writes Java Card Application (JCA) to NFC cards.
+5. Receipt Printer: Prints receipts for transactions.
 
 Issuer and Acquirer communicate using the [ISO 8583](https://en.wikipedia.org/wiki/ISO_8583) standard, leveraging the following Go packages for efficient message handling and network management:
 

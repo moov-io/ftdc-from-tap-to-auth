@@ -13,7 +13,12 @@
    cd ftdc-from-tap-to-auth
    ```
 
-2. Verify your setup:
+2. Install Go modules
+   ```bash
+   go mod download
+   ```
+
+3. Verify your setup:
    ```bash
    make check
    ```
