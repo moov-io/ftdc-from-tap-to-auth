@@ -68,3 +68,11 @@ onemorething:
 	ngrok tcp --region=us --remote-addr=5.tcp.ngrok.io:27433 --log=stdout 2>&1 8588 2>&1 & \
 	go run cmd/onemorething/main.go 2>&1 & \
 	wait
+
+random:
+	@if [ -z "$(N)" ]; then \
+		echo "Usage: make random N=<number>"; \
+		echo "Example: make random N=10"; \
+		exit 1; \
+	fi; \
+	echo $$((0x$$(openssl rand -hex 2) % ($(N)+1)))
