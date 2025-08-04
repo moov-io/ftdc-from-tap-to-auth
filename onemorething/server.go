@@ -165,10 +165,11 @@ func (s *server) handleConn(conn net.Conn) {
 }
 
 type requestData struct {
-	MTI             string `iso8583:"0"`
-	PAN             string `iso8583:"2"`
-	Amount          int64  `iso8583:"4"`
-	ParticipantName string `iso8583:"25"`
+	MTI                string `iso8583:"0"`
+	PAN                string `iso8583:"2"`
+	Amount             int64  `iso8583:"3"`
+	ProcessingDateTime string `iso8583:"4"`
+	ParticipantName    string `iso8583:"25"`
 }
 
 type responseData struct {
