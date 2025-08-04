@@ -24,6 +24,8 @@ curl --location 'http://127.0.0.1:9090/accounts/{accountID}'
 
 ### Issue Card
 
+Please, add ?flashCard=true to the URL if your issuer has configured the flash card feature.
+
 ```bash
 curl --location 'http://127.0.0.1:9090/accounts/d5558564-8a35-4ddf-9525-2de99a1338f2/cards?flashCard=true' \
 --header 'Content-Type: application/json' \
