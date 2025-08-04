@@ -166,7 +166,15 @@ func (s *server) handleConn(conn net.Conn) {
 
 type requestData struct {
 	MTI             string `iso8583:"0"`
+	PAN             string `iso8583:"2"`
+	Amount          int64  `iso8583:"4"`
 	ParticipantName string `iso8583:"25"`
+}
+
+type responseData struct {
+	MTI               string `iso8583:"0"`
+	ApprovalCode      string `iso8583:"5"`
+	AuthorizationCode string `iso8583:"6"`
 }
 
 func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Message) {
@@ -190,10 +198,25 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 	s.logger.Info(
 		"Received request",
 		slog.String("name", request.ParticipantName),
-		slog.Int("num", s.counter),
+		slog.String("pan", request.PAN),
+		slog.Int64("amount", request.Amount),
+		slog.Int("position", s.counter),
 	)
 
-	message.MTI("0110")
+	response := &responseData{
+		MTI:               "0110",
+		ApprovalCode:      "00",
+		AuthorizationCode: fmt.Sprintf("%06d", s.counter),
+	}
+
+	err = message.Marshal(response)
+	if err != nil {
+		s.logger.Error(
+			"Error to marshal response",
+			slog.String("error", err.Error()),
+		)
+		return
+	}
 
 	err = conn.Reply(message)
 	if err != nil {
@@ -204,6 +227,7 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 	}
 
 	if request.ParticipantName == "" {
+		s.logger.Warn("Participant name is empty, skipping printing")
 		return
 	}
 
@@ -230,14 +254,19 @@ func (s *server) handleRequest(conn *connection.Connection, message *iso8583.Mes
 	}
 }
 
-func (s *server) printParticipant(name string) error {
+func (s *server) printParticipant(request requestData, response responseData) error {
 	if s.printerURL == "" {
 		return fmt.Errorf("printer is not configured")
 	}
 
 	receipt := printer.Receipt{
-		Cardholder: name,
-		Short:      true,
+		Cardholder:         request.ParticipantName,
+		Short:              false,
+		ProcessingDateTime: time.Now(),
+		PAN:                request.PAN,
+		Amount:             request.Amount,
+		AuthorizationCode:  response.AuthorizationCode,
+		ResponseCode:       response.ApprovalCode,
 	}
 
 	receiptJSON, err := json.Marshal(receipt)
