@@ -33,10 +33,10 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 			Pref:        prefix.Binary.Fixed,
 		}),
 		2: field.NewString(&field.Spec{
-			Length:      16,
+			Length:      19,
 			Description: "Primary Account Number",
 			Enc:         encoding.ASCII,
-			Pref:        prefix.ASCII.Fixed,
+			Pref:        prefix.ASCII.LL,
 		}),
 		3: field.NewNumeric(&field.Spec{
 			Length:      6,
@@ -127,7 +127,6 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 }
 
 // 2. Define the AuthorizationRequest struct that matches the ISO 8583 specification
-
 type AuthorizationRequest struct {
 	MTI                   string        `iso8583:"0"`
 	PAN                   string        `iso8583:"2"`
@@ -148,7 +147,6 @@ type AcceptorInfo struct {
 }
 
 // 3. Define the AuthorizationResponse struct that matches the ISO 8583 specification
-
 type AuthorizationResponse struct {
 	MTI               string `iso8583:"0"`
 	ApprovalCode      string `iso8583:"5"`
@@ -157,6 +155,8 @@ type AuthorizationResponse struct {
 
 func main() {
 	fmt.Println("FTDC Acquirer is running...")
+
+	msg := iso8583.NewMessage(spec)
 
 	// 4. Create an instance of AuthorizationRequest and marshal it into an ISO 8583 message
 	authRequest := AuthorizationRequest{
@@ -179,7 +179,6 @@ func main() {
 	// 5. Create a new ISO 8583 message using the specification
 	// 6. Marshal and pack the message
 
-	msg := iso8583.NewMessage(spec)
 
 	err := msg.Marshal(authRequest)
 	if err != nil {
@@ -199,7 +198,7 @@ func main() {
 	fmt.Printf("Packed ISO 8583 Message:\n%s\n", packed)
 
 	// 7. connect to the FTDC Issuer and send the message
-	conn, err := net.Dial("tcp", "5.tcp.ngrok.io:27433")
+	conn, err := net.Dial("tcp", "localhost:8583")
 	if err != nil {
 		fmt.Printf("Error connecting to FTDC Issuer: %v\n", err)
 		return
