@@ -1,9 +1,5 @@
 package printer
 
-import (
-	"fmt"
-)
-
 const (
 	// Your printer's USB identifiers
 	VendorID  = 0x0fe6 // 4070
@@ -114,110 +110,52 @@ func NewThermalPrinter() (*ThermalPrinter, error) {
 }
 
 func (tp *ThermalPrinter) sendCommand(data []byte) error {
-	_, err := tp.out.Write(data)
-	return err
+	return nil
+	// _, err := tp.out.Write(data)
+	// return err
 }
 
 func (tp *ThermalPrinter) PrintText(text string) error {
 	// Send text as bytes
-	return tp.sendCommand([]byte(text))
+	return nil
 }
 
 func (tp *ThermalPrinter) PrintLine(text string) error {
 	// Print text with line feed
-	data := append([]byte(text), ESC_FEED...)
-	return tp.sendCommand(data)
+	return nil
 }
 
 func (tp *ThermalPrinter) PrintBold(text string) error {
 	// Bold on, text, bold off, line feed
-	var data []byte
-	data = append(data, ESC_BOLD_ON...)
-	data = append(data, []byte(text)...)
-	data = append(data, ESC_BOLD_OFF...)
-	data = append(data, ESC_FEED...)
-	return tp.sendCommand(data)
+	return nil
 }
 
 func (tp *ThermalPrinter) PrintTitle(title string) error {
 	// Center align, bold on, title, bold off, line feed, left align
-	var data []byte
-	data = append(data, ESC_ALIGN_C...)
-	data = append(data, ESC_BOLD_ON...)
-	data = append(data, []byte(title)...)
-	data = append(data, ESC_BOLD_OFF...)
-	data = append(data, ESC_FEED...)
-	data = append(data, ESC_ALIGN_L...)
-	return tp.sendCommand(data)
+	return nil
 }
 
 func (tp *ThermalPrinter) PrintCentered(text string) error {
 	// Center align, text, left align, line feed
-	var data []byte
-	data = append(data, ESC_ALIGN_C...)
-	data = append(data, []byte(text)...)
-	data = append(data, ESC_FEED...)
-	data = append(data, ESC_ALIGN_L...)
-	return tp.sendCommand(data)
+	return nil
 }
 
 func (tp *ThermalPrinter) Feed(lines int) error {
-	for i := 0; i < lines; i++ {
-		if err := tp.sendCommand(ESC_FEED); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
 func (tp *ThermalPrinter) Cut() error {
-	return tp.sendCommand(ESC_CUT)
+	return nil
 }
 
 func (tp *ThermalPrinter) PrintLines(lines []string) error {
-	for _, line := range lines {
-		// cut off the line if it exceeds 32 characters
-		if len(line) > 32 {
-			line = line[:32]
-		}
-
-		if err := tp.PrintLine(line); err != nil {
-			return fmt.Errorf("failed to print line '%s': %v", line, err)
-		}
-	}
 	return nil
 }
 
 func (tp *ThermalPrinter) PrintBitmapImage(bitmap *BitmapImage) error {
-	widthBytes := (bitmap.Width + 7) / 8
-
-	var command []byte
-
-	tp.sendCommand(ESC_ALIGN_C)
-
-	// ESC/POS command: GS v 0 (Print raster bit image)
-	// Format: 1D 76 30 00 [width_low] [width_high] [height_low] [height_high] [data...]
-	command = append(command, 0x1D, 0x76, 0x30, 0x00)
-	command = append(command, byte(widthBytes&0xFF))    // Width in bytes (low)
-	command = append(command, byte(widthBytes>>8))      // Width in bytes (high)
-	command = append(command, byte(bitmap.Height&0xFF)) // Height (low)
-	command = append(command, byte(bitmap.Height>>8))   // Height (high)
-	command = append(command, bitmap.Data...)           // Bitmap data
-
-	tp.sendCommand(ESC_ALIGN_L)
-
-	return tp.sendCommand(command)
+	return nil
 }
 
 func (tp *ThermalPrinter) Close() error {
-	if tp.intf != nil {
-		tp.intf.Close()
-	}
-	if tp.device != nil {
-		tp.device.Close()
-	}
-	if tp.ctx != nil {
-		tp.ctx.Close()
-	}
 	return nil
 }
