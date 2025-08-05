@@ -206,8 +206,8 @@ func main() {
 		fmt.Printf("Error reading response length from FTDC Issuer: %v\n", err)
 		return
 	}
-
 	responseMessageLength := int(responseLength[0])<<8 | int(responseLength[1])
+
 	packed = make([]byte, responseMessageLength)
 	_, err = conn.Read(packed)
 	if err != nil {
@@ -221,4 +221,5 @@ func main() {
 	// TODO: see the packed message
 	// TODO: unpack the message
 	// TODO see fields in human-readable format
+	// TODO: extract the message
 }
