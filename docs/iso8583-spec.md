@@ -19,7 +19,7 @@ This specification defines a simplified ISO 8583 message format for educational 
 |-------|--------------|---------|---------|---------|-------------|
 | 0 | Message Type Indicator | Req | ANS | 4 | Fixed: "0100" |
 | 1 | Bitmap | Req / Res | B, HEX | 8 | Presence indicator |
-| 2 | Primary Account Number (PAN) | Req | ANS | 16 | Card number |
+| 2 | Primary Account Number (PAN) | Req | ANS | VAR, 19 Max | Card number |
 | 3 | Amount | Req | N | 6 | Transaction amount |
 | 4 | Transmission Date & Time | Req | ANS | 20 | Message timestamp |
 | 5 | Approval Code | Resp | ANS | 2 | Authorization result |
@@ -54,7 +54,8 @@ This specification defines a simplified ISO 8583 message format for educational 
 
 ### Field 2 - Primary Account Number (PAN)
 - **Type**: String
-- **Length**: 16 characters (fixed)
+- **Length**: Variable (up to 19 characters)
+- **Length Prefix**: LL (2-digit length indicator)
 - **Encoding**: ASCII
 - **Description**: The primary account number associated with the card
 

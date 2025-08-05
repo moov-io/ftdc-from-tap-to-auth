@@ -32,7 +32,7 @@ var spec *iso8583.MessageSpec = &iso8583.MessageSpec{
 			Length:      16,
 			Description: "Primary Account Number (PAN)",
 			Enc:         encoding.ASCII,
-			Pref:        prefix.ASCII.Fixed,
+			Pref:        prefix.ASCII.LL,
 		}),
 		3: field.NewNumeric(&field.Spec{
 			Length:      6,
