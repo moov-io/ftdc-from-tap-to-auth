@@ -65,7 +65,7 @@ presenter-printer:
 onemorething:
 	@echo "Starting ngrok and one more thing..."
 	@trap 'kill 0' INT; \
-	ngrok tcp --region=us --remote-addr=5.tcp.ngrok.io:27433 --log=stdout 2>&1 8588 2>&1 & \
+	ngrok tcp --region=us --remote-addr=7.tcp.ngrok.io:21015 --log=stdout 2>&1 8588 2>&1 & \
 	go run cmd/onemorething/main.go 2>&1 & \
 	wait
 
