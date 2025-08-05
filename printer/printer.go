@@ -2,8 +2,6 @@ package printer
 
 import (
 	"fmt"
-
-	"github.com/google/gousb"
 )
 
 const (
@@ -39,78 +37,78 @@ type Printer interface {
 }
 
 type ThermalPrinter struct {
-	ctx    *gousb.Context
-	device *gousb.Device
-	intf   *gousb.Interface
-	out    *gousb.OutEndpoint
+	// ctx    *gousb.Context
+	// device *gousb.Device
+	// intf   *gousb.Interface
+	// out    *gousb.OutEndpoint
 }
 
 func NewThermalPrinter() (*ThermalPrinter, error) {
-	ctx := gousb.NewContext()
+	// ctx := gousb.NewContext()
 
-	// Find the printer device
-	device, err := ctx.OpenDeviceWithVIDPID(VendorID, ProductID)
-	if err != nil {
-		ctx.Close()
-		return nil, fmt.Errorf("failed to open device: %v", err)
-	}
+	// // Find the printer device
+	// device, err := ctx.OpenDeviceWithVIDPID(VendorID, ProductID)
+	// if err != nil {
+	// 	ctx.Close()
+	// 	return nil, fmt.Errorf("failed to open device: %v", err)
+	// }
 
-	if device == nil {
-		ctx.Close()
-		return nil, fmt.Errorf("printer device not found (VID: 0x%04x, PID: 0x%04x)", VendorID, ProductID)
-	}
+	// if device == nil {
+	// 	ctx.Close()
+	// 	return nil, fmt.Errorf("printer device not found (VID: 0x%04x, PID: 0x%04x)", VendorID, ProductID)
+	// }
 
-	// Get device configuration
-	config, err := device.Config(1)
-	if err != nil {
-		device.Close()
-		ctx.Close()
-		return nil, fmt.Errorf("failed to get config: %v", err)
-	}
+	// // Get device configuration
+	// config, err := device.Config(1)
+	// if err != nil {
+	// 	device.Close()
+	// 	ctx.Close()
+	// 	return nil, fmt.Errorf("failed to get config: %v", err)
+	// }
 
-	// Claim interface (usually interface 0 for printers)
-	intf, err := config.Interface(0, 0)
-	if err != nil {
-		device.Close()
-		ctx.Close()
-		return nil, fmt.Errorf("failed to claim interface: %v", err)
-	}
+	// // Claim interface (usually interface 0 for printers)
+	// intf, err := config.Interface(0, 0)
+	// if err != nil {
+	// 	device.Close()
+	// 	ctx.Close()
+	// 	return nil, fmt.Errorf("failed to claim interface: %v", err)
+	// }
 
-	// Find bulk out endpoint
-	var outEndpoint *gousb.OutEndpoint
-	for _, endpoint := range intf.Setting.Endpoints {
-		if endpoint.Direction == gousb.EndpointDirectionOut &&
-			endpoint.TransferType == gousb.TransferTypeBulk {
-			outEndpoint, err = intf.OutEndpoint(endpoint.Number)
-			if err != nil {
-				intf.Close()
-				device.Close()
-				ctx.Close()
-				return nil, fmt.Errorf("failed to get out endpoint: %v", err)
-			}
-			break
-		}
-	}
+	// // Find bulk out endpoint
+	// var outEndpoint *gousb.OutEndpoint
+	// for _, endpoint := range intf.Setting.Endpoints {
+	// 	if endpoint.Direction == gousb.EndpointDirectionOut &&
+	// 		endpoint.TransferType == gousb.TransferTypeBulk {
+	// 		outEndpoint, err = intf.OutEndpoint(endpoint.Number)
+	// 		if err != nil {
+	// 			intf.Close()
+	// 			device.Close()
+	// 			ctx.Close()
+	// 			return nil, fmt.Errorf("failed to get out endpoint: %v", err)
+	// 		}
+	// 		break
+	// 	}
+	// }
 
-	if outEndpoint == nil {
-		intf.Close()
-		device.Close()
-		ctx.Close()
-		return nil, fmt.Errorf("no bulk out endpoint found")
-	}
+	// if outEndpoint == nil {
+	// 	intf.Close()
+	// 	device.Close()
+	// 	ctx.Close()
+	// 	return nil, fmt.Errorf("no bulk out endpoint found")
+	// }
 
 	printer := &ThermalPrinter{
-		ctx:    ctx,
-		device: device,
-		intf:   intf,
-		out:    outEndpoint,
+		// ctx:    ctx,
+		// device: device,
+		// intf:   intf,
+		// out:    outEndpoint,
 	}
 
 	// Initialize printer
-	if err := printer.sendCommand(ESC_INIT); err != nil {
-		printer.Close()
-		return nil, fmt.Errorf("failed to initialize printer: %v", err)
-	}
+	// if err := printer.sendCommand(ESC_INIT); err != nil {
+	// 	printer.Close()
+	// 	return nil, fmt.Errorf("failed to initialize printer: %v", err)
+	// }
 
 	return printer, nil
 }
