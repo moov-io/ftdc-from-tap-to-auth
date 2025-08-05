@@ -214,7 +214,7 @@ func (s *Service) printReceipt(receipt Receipt) error {
 		return fmt.Errorf("error printing title: %w", err)
 	}
 
-	err = s.printer.Feed(3)
+	err = s.printer.Feed(4)
 	if err != nil {
 		return fmt.Errorf("error feeding paper: %w", err)
 	}
