@@ -71,7 +71,14 @@ func (i *client) GetAccount(accountID string) (models.Account, error) {
 		return models.Account{}, err
 	}
 
-	return account, nil
+	// Copy fields so we don't return a sync.Mutex by value (copylocks).
+	return models.Account{
+		ID:               account.ID,
+		OwnerName:        account.OwnerName,
+		AvailableBalance: account.AvailableBalance,
+		HoldBalance:      account.HoldBalance,
+		Currency:         account.Currency,
+	}, nil
 }
 
 // IssueCard issues a new card for the given account ID and returns the card or
