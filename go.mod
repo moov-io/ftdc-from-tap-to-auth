@@ -1,12 +1,12 @@
 module github.com/moov-io/ftdc-from-tap-to-auth
 
-go 1.23.1
+go 1.24
 
 toolchain go1.24.5
 
 require (
 	github.com/ebfe/scard v0.0.0-20230420082256-7db3f9b7c8a7
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.5.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/google/uuid v1.3.0
 	github.com/kr/pretty v0.3.1
